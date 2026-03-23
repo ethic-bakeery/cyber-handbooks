@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cybersecurity Handbook Library</title>
+
+    <style>
+        body {
+            margin: 0;
+            font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+            background: #0d1117;
+            color: #e6edf3;
+        }
+
+        header {
+            text-align: center;
+            padding: 40px 20px;
+            border-bottom: 1px solid #30363d;
+        }
+
+        header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+
+        header p {
+            color: #8b949e;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: auto;
+            padding: 30px;
+        }
+
+        .card {
+            background: #161b22;
+            border: 1px solid #30363d;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            transition: 0.2s;
+        }
+
+        .card:hover {
+            border-color: #58a6ff;
+            transform: translateY(-3px);
+        }
+
+        .card h2 {
+            margin-top: 0;
+            color: #58a6ff;
+        }
+
+        .card p {
+            color: #c9d1d9;
+        }
+
+        .tag {
+            display: inline-block;
+            background: #21262d;
+            padding: 5px 10px;
+            margin: 5px 5px 0 0;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            color: #8b949e;
+        }
+
+        .btn {
+            display: inline-block;
+            margin-top: 15px;
+            padding: 10px 15px;
+            background: #238636;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            font-size: 0.9rem;
+        }
+
+        .btn:hover {
+            background: #2ea043;
+        }
+
+        footer {
+            text-align: center;
+            padding: 20px;
+            border-top: 1px solid #30363d;
+            color: #8b949e;
+            margin-top: 40px;
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+    <h1>Cybersecurity Handbook Library</h1>
+    <p>Practical, real-world guides for SOC Analysts, Threat Hunters, and Blue Teamers</p>
+</header>
+
+<div class="container">
+
+    <!-- LOG ANALYSIS HANDBOOK -->
+    <div class="card">
+        <h2>Log Analysis Handbook</h2>
+
+        <p>
+            A complete, real-world SOC analyst guide to log analysis across Windows, Linux, macOS, and network logs.
+            Covers SIEM queries (Splunk, KQL, Elastic, QRadar), detection engineering, signal vs noise, and full attack timelines.
+        </p>
+
+        <div>
+            <span class="tag">SIEM</span>
+            <span class="tag">Threat Detection</span>
+            <span class="tag">Log Analysis</span>
+            <span class="tag">SOC</span>
+        </div>
+
+        <a class="btn" href="log_analysis_handbook.html">Read Handbook →</a>
+    </div>
+
+    <!-- WINDOWS INTERNALS -->
+    <div class="card">
+        <h2>Windows Internals for Security Analysts</h2>
+
+        <p>
+            Deep dive into Windows internals from a security perspective  processes, services, WMI, scheduled tasks,
+            networking stack, ETW, persistence techniques, and malware behavior.
+            Includes real attack techniques and detection strategies.
+        </p>
+
+        <div>
+            <span class="tag">Windows Internals</span>
+            <span class="tag">Malware Analysis</span>
+            <span class="tag">Persistence</span>
+            <span class="tag">DFIR</span>
+        </div>
+
+        <a class="btn" href="windows_internals_complete.html">Explore Guide →</a>
+    </div>
+
+</div>
+
+<footer>
+    Built for learning, detection, and real-world cybersecurity practice.
+</footer>
+
+</body>
+</htm
