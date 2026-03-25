@@ -1,0 +1,1479 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>SOC Analyst Training Program</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Syne:wght@400;700;800&family=IBM+Plex+Sans:wght@300;400;600&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg: #080c10;
+    --surface: #0d1117;
+    --card: #111820;
+    --border: #1e2d3d;
+    --accent: #00e5ff;
+    --accent2: #ff3d71;
+    --accent3: #a8ff78;
+    --text: #cdd9e5;
+    --muted: #8b949e;
+    --phase1: #00e5ff;
+    --phase2: #7b61ff;
+    --phase3: #ff6b35;
+    --phase4: #00d68f;
+    --phase5: #ffaa00;
+    --phase6: #ff3d71;
+    --phase7: #a8ff78;
+    --phase8: #00b4d8;
+    --phase9: #e040fb;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: 15px;
+    line-height: 1.7;
+    overflow-x: hidden;
+  }
+
+  /* Grid bg */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: linear-gradient(rgba(0,229,255,0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,229,255,0.03) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  h1, h2, h3 { font-family: 'Syne', sans-serif; }
+  code, pre { font-family: 'JetBrains Mono', monospace; }
+
+  .hero-title {
+    font-size: clamp(2.2rem, 6vw, 4.5rem);
+    font-weight: 800;
+    line-height: 1.1;
+    letter-spacing: -1px;
+  }
+
+  .glow {
+    text-shadow: 0 0 30px var(--accent), 0 0 60px rgba(0,229,255,0.3);
+  }
+
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    transition: border-color 0.3s, transform 0.2s;
+    position: relative;
+    overflow: hidden;
+  }
+  .card:hover { transform: translateY(-2px); }
+
+  .phase-badge {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 2px;
+    padding: 3px 10px;
+    border-radius: 999px;
+    text-transform: uppercase;
+  }
+
+  .code-block {
+    background: #0a0e14;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1rem 1.25rem;
+    font-size: 0.82rem;
+    line-height: 1.8;
+    overflow-x: auto;
+    position: relative;
+  }
+  .code-block .prompt { color: var(--accent3); }
+  .code-block .comment { color: var(--muted); }
+  .code-block .keyword { color: var(--accent); }
+  .code-block .string { color: #f78166; }
+  .code-block .value { color: #ffa657; }
+
+  .tag { color: var(--accent3); }
+  .tag-close { color: #f78166; }
+
+  .rule-block {
+    background: #070d15;
+    border-left: 3px solid var(--accent);
+    border-radius: 0 8px 8px 0;
+    padding: 1rem 1.25rem;
+    font-size: 0.8rem;
+    line-height: 2;
+    overflow-x: auto;
+  }
+
+  .pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.72rem;
+    font-family: 'JetBrains Mono', monospace;
+    padding: 2px 10px;
+    border-radius: 999px;
+    border: 1px solid;
+    white-space: nowrap;
+  }
+
+  .timeline-line {
+    position: absolute;
+    left: 28px;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: linear-gradient(to bottom, var(--accent), var(--accent2), var(--accent3));
+    opacity: 0.3;
+  }
+
+  .nav-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--accent);
+    box-shadow: 0 0 8px var(--accent);
+  }
+
+  .section-num {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    color: var(--muted);
+    letter-spacing: 2px;
+  }
+
+  /* Animated scan line */
+  .scan-line {
+    position: absolute;
+    left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--accent), transparent);
+    animation: scan 4s linear infinite;
+    opacity: 0.5;
+  }
+  @keyframes scan {
+    0% { top: 0; }
+    100% { top: 100%; }
+  }
+
+  /* Blinking cursor */
+  .cursor::after {
+    content: '|';
+    animation: blink 1s step-end infinite;
+    color: var(--accent);
+    margin-left: 2px;
+  }
+  @keyframes blink { 50% { opacity: 0; } }
+
+  /* Accordion */
+  .accordion-content { display: none; }
+  .accordion-toggle:checked + .accordion-label + .accordion-content { display: block; }
+  .accordion-label { cursor: pointer; user-select: none; }
+  .accordion-toggle { display: none; }
+  .accordion-label .chevron { transition: transform 0.3s; }
+  .accordion-toggle:checked + .accordion-label .chevron { transform: rotate(180deg); }
+
+  .attack-chip {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    padding: 3px 10px;
+    border-radius: 4px;
+    background: rgba(0,229,255,0.08);
+    border: 1px solid rgba(0,229,255,0.2);
+    color: var(--accent);
+    white-space: nowrap;
+  }
+
+  .stat-num {
+    font-family: 'Syne', sans-serif;
+    font-size: 2rem;
+    font-weight: 800;
+    line-height: 1;
+  }
+
+  /* SVG diagram */
+  .diagram { background: #0a0e14; border: 1px solid var(--border); border-radius: 10px; padding: 1.5rem; }
+
+  /* Tooltip */
+  [data-tip] { position: relative; cursor: help; }
+  [data-tip]::after {
+    content: attr(data-tip);
+    position: absolute;
+    bottom: 120%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #1a2535;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 6px 12px;
+    font-size: 0.72rem;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s;
+    z-index: 99;
+    font-family: 'IBM Plex Sans', sans-serif;
+  }
+  [data-tip]:hover::after { opacity: 1; }
+
+  /* Alert simulation */
+  @keyframes alertPulse {
+    0%, 100% { background: rgba(255,61,113,0.1); }
+    50% { background: rgba(255,61,113,0.2); }
+  }
+  .alert-sim { animation: alertPulse 2s ease-in-out infinite; }
+
+  /* Progress bar */
+  .progress-fill {
+    height: 4px;
+    border-radius: 2px;
+    background: linear-gradient(90deg, var(--accent), var(--accent2));
+    box-shadow: 0 0 8px var(--accent);
+    transition: width 0.5s ease;
+  }
+
+  .sticky-nav {
+    position: sticky;
+    top: 0;
+    z-index: 50;
+    backdrop-filter: blur(12px);
+    background: rgba(8,12,16,0.85);
+    border-bottom: 1px solid var(--border);
+  }
+
+  /* Glowing border on hover */
+  .glow-card:hover {
+    box-shadow: 0 0 0 1px var(--accent), 0 0 20px rgba(0,229,255,0.1);
+  }
+</style>
+</head>
+<body>
+
+<!-- ── STICKY NAV ──────────────────────────────────────────────── -->
+<nav class="sticky-nav px-6 py-3">
+  <div class="max-w-7xl mx-auto flex items-center justify-between">
+    <div class="flex items-center gap-3">
+      <svg width="28" height="28" viewBox="0 0 28 28" fill="none">
+        <circle cx="14" cy="14" r="13" stroke="#00e5ff" stroke-width="1.5"/>
+        <path d="M9 14l3 3 7-7" stroke="#00e5ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        <circle cx="14" cy="14" r="5" stroke="#00e5ff" stroke-width="0.5" opacity="0.4"/>
+      </svg>
+      <span style="font-family:'Syne',sans-serif;font-weight:800;font-size:1rem;color:#fff">SOC<span style="color:var(--accent)">MASTER</span></span>
+    </div>
+    <div class="hidden md:flex items-center gap-5 text-xs" style="font-family:'JetBrains Mono',monospace;color:var(--muted)">
+      <a href="#phase1" class="hover:text-white transition-colors">P1·SETUP</a>
+      <a href="#phase2" class="hover:text-white transition-colors">P2·PCAP</a>
+      <a href="#phase3" class="hover:text-white transition-colors">P3·DETECT</a>
+      <a href="#phase4" class="hover:text-white transition-colors">P4·RULES</a>
+      <a href="#phase5" class="hover:text-white transition-colors">P5·TEST</a>
+      <a href="#phase6" class="hover:text-white transition-colors">P6·SIEM</a>
+      <a href="#phase7" class="hover:text-white transition-colors">P7·HUNT</a>
+      <a href="#phase8" class="hover:text-white transition-colors">P8·OPS</a>
+      <a href="#phase9" class="hover:text-white transition-colors">P9·LAB</a>
+    </div>
+    <span class="pill" style="border-color:rgba(168,255,120,0.3);color:var(--accent3)">
+      <span class="inline-block w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse"></span>
+      LIVE TRAINING
+    </span>
+  </div>
+</nav>
+
+<div class="relative z-10 max-w-7xl mx-auto px-4 md:px-8 py-12">
+
+<!-- ── HERO ──────────────────────────────────────────────────────── -->
+<header class="mb-20 relative">
+  <div class="absolute top-0 right-0 w-72 h-72 rounded-full opacity-10" style="background:radial-gradient(circle, var(--accent), transparent 70%);filter:blur(60px);pointer-events:none;"></div>
+
+  <p class="section-num mb-4">// SENIOR SOC ANALYST MENTORSHIP PROGRAM</p>
+  <h1 class="hero-title mb-4">
+    <span style="color:#fff">Network Traffic</span><br/>
+    <span class="glow" style="color:var(--accent)">Analysis &</span><br/>
+    <span style="color:#fff">Detection Engineering</span>
+  </h1>
+  <p class="text-base max-w-2xl mb-8" style="color:var(--muted);line-height:1.8">
+    A complete, hands-on SOC training program. From raw PCAPs to production-grade IDS rules, SIEM dashboards, and threat hunting — taught by a 10-year veteran, step by brutal step.
+  </p>
+
+  <!-- Stats row -->
+  <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
+    <div class="card p-5 text-center glow-card">
+      <div class="stat-num mb-1" style="color:var(--accent)">9</div>
+      <div class="text-xs" style="color:var(--muted);font-family:'JetBrains Mono',monospace">TRAINING PHASES</div>
+    </div>
+    <div class="card p-5 text-center glow-card">
+      <div class="stat-num mb-1" style="color:var(--phase3)">12+</div>
+      <div class="text-xs" style="color:var(--muted);font-family:'JetBrains Mono',monospace">ATTACK TYPES</div>
+    </div>
+    <div class="card p-5 text-center glow-card">
+      <div class="stat-num mb-1" style="color:var(--accent3)">3</div>
+      <div class="text-xs" style="color:var(--muted);font-family:'JetBrains Mono',monospace">IDS ENGINES</div>
+    </div>
+    <div class="card p-5 text-center glow-card">
+      <div class="stat-num mb-1" style="color:var(--phase6)">100%</div>
+      <div class="text-xs" style="color:var(--muted);font-family:'JetBrains Mono',monospace">HANDS-ON</div>
+    </div>
+  </div>
+
+  <!-- Attack type chips -->
+  <div class="mb-4 text-xs" style="color:var(--muted);font-family:'JetBrains Mono',monospace">// PCAP DATASET COVERAGE:</div>
+  <div class="flex flex-wrap gap-2">
+    <span class="attack-chip">ARP Poisoning</span>
+    <span class="attack-chip">DNS Tunneling</span>
+    <span class="attack-chip">ICMP Attacks</span>
+    <span class="attack-chip">Nmap Scans</span>
+    <span class="attack-chip">TCP Hijacking</span>
+    <span class="attack-chip">Telnet Tunnel</span>
+    <span class="attack-chip">UDP Tunneling</span>
+    <span class="attack-chip">SSL Renegotiation</span>
+    <span class="attack-chip">Fuzzing</span>
+    <span class="attack-chip">XSS / HTTP Manip</span>
+    <span class="attack-chip">Rogue AP</span>
+    <span class="attack-chip">Deauth Attacks</span>
+  </div>
+</header>
+
+<!-- ── LEARNING PATH DIAGRAM ─────────────────────────────────────── -->
+<section class="mb-20">
+  <p class="section-num mb-3">// OVERVIEW</p>
+  <h2 class="text-2xl font-bold mb-6" style="font-family:'Syne',sans-serif">Training Roadmap</h2>
+
+  <div class="diagram overflow-x-auto">
+    <svg viewBox="0 0 900 120" xmlns="http://www.w3.org/2000/svg" style="width:100%;min-width:600px">
+      <defs>
+        <marker id="arr" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
+          <path d="M0,0 L0,6 L6,3 z" fill="#1e2d3d"/>
+        </marker>
+      </defs>
+      <!-- Connector lines -->
+      <line x1="92" y1="60" x2="108" y2="60" stroke="#1e2d3d" stroke-width="1.5" marker-end="url(#arr)"/>
+      <line x1="192" y1="60" x2="208" y2="60" stroke="#1e2d3d" stroke-width="1.5" marker-end="url(#arr)"/>
+      <line x1="292" y1="60" x2="308" y2="60" stroke="#1e2d3d" stroke-width="1.5" marker-end="url(#arr)"/>
+      <line x1="392" y1="60" x2="408" y2="60" stroke="#1e2d3d" stroke-width="1.5" marker-end="url(#arr)"/>
+      <line x1="492" y1="60" x2="508" y2="60" stroke="#1e2d3d" stroke-width="1.5" marker-end="url(#arr)"/>
+      <line x1="592" y1="60" x2="608" y2="60" stroke="#1e2d3d" stroke-width="1.5" marker-end="url(#arr)"/>
+      <line x1="692" y1="60" x2="708" y2="60" stroke="#1e2d3d" stroke-width="1.5" marker-end="url(#arr)"/>
+      <line x1="792" y1="60" x2="808" y2="60" stroke="#1e2d3d" stroke-width="1.5" marker-end="url(#arr)"/>
+      <!-- Nodes -->
+      <g>
+        <!-- P1 -->
+        <circle cx="50" cy="60" r="28" fill="#0d1117" stroke="#00e5ff" stroke-width="1.5"/>
+        <text x="50" y="55" text-anchor="middle" fill="#00e5ff" font-size="10" font-family="JetBrains Mono">P1</text>
+        <text x="50" y="68" text-anchor="middle" fill="#8b949e" font-size="7.5" font-family="JetBrains Mono">SETUP</text>
+        <!-- P2 -->
+        <circle cx="150" cy="60" r="28" fill="#0d1117" stroke="#7b61ff" stroke-width="1.5"/>
+        <text x="150" y="55" text-anchor="middle" fill="#7b61ff" font-size="10" font-family="JetBrains Mono">P2</text>
+        <text x="150" y="68" text-anchor="middle" fill="#8b949e" font-size="7.5" font-family="JetBrains Mono">PCAP</text>
+        <!-- P3 -->
+        <circle cx="250" cy="60" r="28" fill="#0d1117" stroke="#ff6b35" stroke-width="1.5"/>
+        <text x="250" y="55" text-anchor="middle" fill="#ff6b35" font-size="10" font-family="JetBrains Mono">P3</text>
+        <text x="250" y="68" text-anchor="middle" fill="#8b949e" font-size="7.5" font-family="JetBrains Mono">DETECT</text>
+        <!-- P4 -->
+        <circle cx="350" cy="60" r="28" fill="#0d1117" stroke="#00d68f" stroke-width="1.5"/>
+        <text x="350" y="55" text-anchor="middle" fill="#00d68f" font-size="10" font-family="JetBrains Mono">P4</text>
+        <text x="350" y="68" text-anchor="middle" fill="#8b949e" font-size="7.5" font-family="JetBrains Mono">RULES</text>
+        <!-- P5 -->
+        <circle cx="450" cy="60" r="28" fill="#0d1117" stroke="#ffaa00" stroke-width="1.5"/>
+        <text x="450" y="55" text-anchor="middle" fill="#ffaa00" font-size="10" font-family="JetBrains Mono">P5</text>
+        <text x="450" y="68" text-anchor="middle" fill="#8b949e" font-size="7.5" font-family="JetBrains Mono">TEST</text>
+        <!-- P6 -->
+        <circle cx="550" cy="60" r="28" fill="#0d1117" stroke="#ff3d71" stroke-width="1.5"/>
+        <text x="550" y="55" text-anchor="middle" fill="#ff3d71" font-size="10" font-family="JetBrains Mono">P6</text>
+        <text x="550" y="68" text-anchor="middle" fill="#8b949e" font-size="7.5" font-family="JetBrains Mono">SIEM</text>
+        <!-- P7 -->
+        <circle cx="650" cy="60" r="28" fill="#0d1117" stroke="#a8ff78" stroke-width="1.5"/>
+        <text x="650" y="55" text-anchor="middle" fill="#a8ff78" font-size="10" font-family="JetBrains Mono">P7</text>
+        <text x="650" y="68" text-anchor="middle" fill="#8b949e" font-size="7.5" font-family="JetBrains Mono">HUNT</text>
+        <!-- P8 -->
+        <circle cx="750" cy="60" r="28" fill="#0d1117" stroke="#00b4d8" stroke-width="1.5"/>
+        <text x="750" y="55" text-anchor="middle" fill="#00b4d8" font-size="10" font-family="JetBrains Mono">P8</text>
+        <text x="750" y="68" text-anchor="middle" fill="#8b949e" font-size="7.5" font-family="JetBrains Mono">OPS</text>
+        <!-- P9 -->
+        <circle cx="850" cy="60" r="28" fill="#0d1117" stroke="#e040fb" stroke-width="1.5"/>
+        <text x="850" y="55" text-anchor="middle" fill="#e040fb" font-size="10" font-family="JetBrains Mono">P9</text>
+        <text x="850" y="68" text-anchor="middle" fill="#8b949e" font-size="7.5" font-family="JetBrains Mono">LAB</text>
+      </g>
+    </svg>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     PHASE 1 — LAB SETUP
+═══════════════════════════════════════════════════════════════ -->
+<section id="phase1" class="mb-20">
+  <div class="flex items-center gap-4 mb-8">
+    <div class="w-12 h-12 rounded-xl flex items-center justify-center shrink-0" style="background:rgba(0,229,255,0.1);border:1px solid rgba(0,229,255,0.3)">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#00e5ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8m-4-4v4"/>
+      </svg>
+    </div>
+    <div>
+      <span class="phase-badge" style="background:rgba(0,229,255,0.12);color:var(--phase1);border:1px solid rgba(0,229,255,0.3)">PHASE 01</span>
+      <h2 class="text-2xl font-bold mt-1" style="font-family:'Syne',sans-serif">Lab Setup & Environment</h2>
+    </div>
+  </div>
+
+  <!-- Tool stack diagram -->
+  <div class="diagram mb-6">
+    <p class="text-xs mb-4" style="color:var(--muted);font-family:'JetBrains Mono',monospace">// TOOL STACK ARCHITECTURE</p>
+    <svg viewBox="0 0 700 180" xmlns="http://www.w3.org/2000/svg" style="width:100%">
+      <!-- PCAP -->
+      <rect x="10" y="60" width="100" height="60" rx="8" fill="#0d1117" stroke="#00e5ff" stroke-width="1.5"/>
+      <text x="60" y="86" text-anchor="middle" fill="#00e5ff" font-size="11" font-family="JetBrains Mono">PCAP</text>
+      <text x="60" y="103" text-anchor="middle" fill="#8b949e" font-size="9" font-family="JetBrains Mono">Files</text>
+      <!-- Arrow -->
+      <path d="M110,90 L145,90" stroke="#1e2d3d" stroke-width="1.5" marker-end="url(#arr)"/>
+      <!-- tcpdump -->
+      <rect x="148" y="30" width="100" height="45" rx="8" fill="#0d1117" stroke="#7b61ff" stroke-width="1.5"/>
+      <text x="198" y="52" text-anchor="middle" fill="#7b61ff" font-size="10" font-family="JetBrains Mono">tcpdump</text>
+      <text x="198" y="66" text-anchor="middle" fill="#8b949e" font-size="8.5" font-family="JetBrains Mono">CLI analysis</text>
+      <!-- Wireshark -->
+      <rect x="148" y="105" width="100" height="45" rx="8" fill="#0d1117" stroke="#ff6b35" stroke-width="1.5"/>
+      <text x="198" y="127" text-anchor="middle" fill="#ff6b35" font-size="10" font-family="JetBrains Mono">Wireshark</text>
+      <text x="198" y="141" text-anchor="middle" fill="#8b949e" font-size="8.5" font-family="JetBrains Mono">GUI analysis</text>
+      <!-- Arrow to IDS -->
+      <path d="M248,90 L283,90" stroke="#1e2d3d" stroke-width="1.5" marker-end="url(#arr)"/>
+      <!-- Suricata -->
+      <rect x="285" y="15" width="95" height="40" rx="8" fill="#0d1117" stroke="#00d68f" stroke-width="1.5"/>
+      <text x="333" y="33" text-anchor="middle" fill="#00d68f" font-size="10" font-family="JetBrains Mono">Suricata</text>
+      <text x="333" y="47" text-anchor="middle" fill="#8b949e" font-size="8" font-family="JetBrains Mono">IDS Engine</text>
+      <!-- Snort -->
+      <rect x="285" y="70" width="95" height="40" rx="8" fill="#0d1117" stroke="#ffaa00" stroke-width="1.5"/>
+      <text x="333" y="88" text-anchor="middle" fill="#ffaa00" font-size="10" font-family="JetBrains Mono">Snort</text>
+      <text x="333" y="102" text-anchor="middle" fill="#8b949e" font-size="8" font-family="JetBrains Mono">IDS Engine</text>
+      <!-- Zeek -->
+      <rect x="285" y="125" width="95" height="40" rx="8" fill="#0d1117" stroke="#ff3d71" stroke-width="1.5"/>
+      <text x="333" y="143" text-anchor="middle" fill="#ff3d71" font-size="10" font-family="JetBrains Mono">Zeek</text>
+      <text x="333" y="157" text-anchor="middle" fill="#8b949e" font-size="8" font-family="JetBrains Mono">NSM + Logs</text>
+      <!-- Arrows to SIEM -->
+      <path d="M380,35 L415,78" stroke="#1e2d3d" stroke-width="1" stroke-dasharray="3,2"/>
+      <path d="M380,90 L415,90" stroke="#1e2d3d" stroke-width="1" stroke-dasharray="3,2"/>
+      <path d="M380,145 L415,100" stroke="#1e2d3d" stroke-width="1" stroke-dasharray="3,2"/>
+      <!-- ELK/Wazuh -->
+      <rect x="418" y="55" width="110" height="70" rx="8" fill="#0d1117" stroke="#e040fb" stroke-width="1.5"/>
+      <text x="473" y="83" text-anchor="middle" fill="#e040fb" font-size="10" font-family="JetBrains Mono">ELK / Wazuh</text>
+      <text x="473" y="97" text-anchor="middle" fill="#8b949e" font-size="8" font-family="JetBrains Mono">SIEM + Dashboard</text>
+      <text x="473" y="114" text-anchor="middle" fill="#8b949e" font-size="8" font-family="JetBrains Mono">Log Correlation</text>
+      <!-- Arrow to SOC -->
+      <path d="M528,90 L563,90" stroke="#1e2d3d" stroke-width="1.5" marker-end="url(#arr)"/>
+      <!-- SOC Analyst -->
+      <rect x="565" y="55" width="110" height="70" rx="8" fill="#0d1117" stroke="#00b4d8" stroke-width="1.5"/>
+      <text x="620" y="83" text-anchor="middle" fill="#00b4d8" font-size="10" font-family="JetBrains Mono">SOC Analyst</text>
+      <text x="620" y="97" text-anchor="middle" fill="#8b949e" font-size="8" font-family="JetBrains Mono">Alert Triage</text>
+      <text x="620" y="114" text-anchor="middle" fill="#8b949e" font-size="8" font-family="JetBrains Mono">Threat Hunting</text>
+    </svg>
+  </div>
+
+  <div class="grid md:grid-cols-2 gap-6 mb-6">
+    <!-- Install commands -->
+    <div class="card p-6 glow-card">
+      <div class="flex items-center gap-2 mb-4">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#00e5ff" stroke-width="2"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
+        <span class="text-sm font-semibold" style="color:var(--phase1)">Tool Installation (Ubuntu/Debian)</span>
+      </div>
+      <div class="code-block text-xs">
+<span class="comment"># Update system first</span><br/>
+<span class="prompt">$</span> <span class="keyword">sudo</span> apt update && apt upgrade -y<br/><br/>
+<span class="comment"># Wireshark + tcpdump</span><br/>
+<span class="prompt">$</span> <span class="keyword">sudo</span> apt install -y wireshark tcpdump<br/><br/>
+<span class="comment"># Suricata (IDS/IPS)</span><br/>
+<span class="prompt">$</span> <span class="keyword">sudo</span> apt install -y suricata<br/>
+<span class="prompt">$</span> suricata --version<br/><br/>
+<span class="comment"># Snort (classic IDS)</span><br/>
+<span class="prompt">$</span> <span class="keyword">sudo</span> apt install -y snort<br/><br/>
+<span class="comment"># Zeek (NSM framework)</span><br/>
+<span class="prompt">$</span> <span class="keyword">sudo</span> apt install -y zeek<br/>
+<span class="prompt">$</span> <span class="keyword">echo</span> <span class="string">'export PATH=$PATH:/opt/zeek/bin'</span> >> ~/.bashrc<br/>
+<span class="prompt">$</span> <span class="keyword">source</span> ~/.bashrc
+      </div>
+    </div>
+
+    <!-- Directory structure -->
+    <div class="card p-6 glow-card">
+      <div class="flex items-center gap-2 mb-4">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#7b61ff" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+        <span class="text-sm font-semibold" style="color:var(--phase2)">Lab Directory Structure</span>
+      </div>
+      <div class="code-block text-xs">
+<span class="comment"># Create lab workspace</span><br/>
+<span class="prompt">$</span> <span class="keyword">mkdir</span> -p ~/soc-lab/{pcaps,rules,logs,alerts,reports}<br/>
+<span class="prompt">$</span> <span class="keyword">mkdir</span> -p ~/soc-lab/rules/{snort,suricata,zeek}<br/><br/>
+<span class="string">~/soc-lab/</span><br/>
+<span class="value">├── pcaps/</span>       <span class="comment"># your PCAP dataset</span><br/>
+<span class="value">├── rules/</span><br/>
+<span class="value">│   ├── snort/</span>   <span class="comment"># .rules files</span><br/>
+<span class="value">│   ├── suricata/</span><span class="comment"># .rules files</span><br/>
+<span class="value">│   └── zeek/</span>    <span class="comment"># .zeek scripts</span><br/>
+<span class="value">├── logs/</span>        <span class="comment"># IDS/Zeek output</span><br/>
+<span class="value">├── alerts/</span>      <span class="comment"># eve.json, unified2</span><br/>
+<span class="value">└── reports/</span>     <span class="comment"># analysis notes</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- PCAP Replay -->
+  <div class="card p-6 mb-6 glow-card" style="border-color:rgba(0,229,255,0.15)">
+    <div class="flex items-center gap-2 mb-4">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#00e5ff" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+      <span class="text-sm font-semibold" style="color:var(--phase1)">Replaying PCAPs into IDS (Offline Mode)</span>
+    </div>
+    <div class="grid md:grid-cols-3 gap-4">
+      <div>
+        <p class="text-xs mb-2" style="color:var(--muted);font-family:'JetBrains Mono',monospace">// SURICATA</p>
+        <div class="code-block text-xs">
+<span class="prompt">$</span> suricata -r <span class="string">pcaps/arp.pcap</span> \<br/>
+&nbsp;&nbsp;-c /etc/suricata/suricata.yaml \<br/>
+&nbsp;&nbsp;-l <span class="string">logs/suricata/</span> \<br/>
+&nbsp;&nbsp;-S <span class="string">rules/suricata/custom.rules</span>
+        </div>
+      </div>
+      <div>
+        <p class="text-xs mb-2" style="color:var(--muted);font-family:'JetBrains Mono',monospace">// SNORT</p>
+        <div class="code-block text-xs">
+<span class="prompt">$</span> snort -r <span class="string">pcaps/dns.pcap</span> \<br/>
+&nbsp;&nbsp;-c /etc/snort/snort.conf \<br/>
+&nbsp;&nbsp;-l <span class="string">logs/snort/</span> \<br/>
+&nbsp;&nbsp;-A console -q
+        </div>
+      </div>
+      <div>
+        <p class="text-xs mb-2" style="color:var(--muted);font-family:'JetBrains Mono',monospace">// ZEEK</p>
+        <div class="code-block text-xs">
+<span class="prompt">$</span> zeek -r <span class="string">pcaps/icmp.pcap</span> \<br/>
+&nbsp;&nbsp;<span class="string">local.zeek</span> \<br/>
+&nbsp;&nbsp;LogAscii::use_json=T \<br/>
+&nbsp;&nbsp;-C
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mentor note -->
+  <div class="rounded-lg p-5" style="background:rgba(0,229,255,0.04);border:1px solid rgba(0,229,255,0.15)">
+    <div class="flex gap-3">
+      <div class="shrink-0 mt-1">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#00e5ff" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      </div>
+      <div>
+        <p class="text-xs font-semibold mb-1" style="color:var(--accent);font-family:'JetBrains Mono',monospace">MENTOR NOTE</p>
+        <p class="text-sm" style="color:var(--muted)">Don't skip the directory structure. Disorganized labs = missed alerts. Real SOCs have strict file naming, retention policies, and log paths. Build the habit from day one.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     PHASE 2 — PCAP ANALYSIS
+═══════════════════════════════════════════════════════════════ -->
+<section id="phase2" class="mb-20">
+  <div class="flex items-center gap-4 mb-8">
+    <div class="w-12 h-12 rounded-xl flex items-center justify-center shrink-0" style="background:rgba(123,97,255,0.1);border:1px solid rgba(123,97,255,0.3)">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#7b61ff" stroke-width="2" stroke-linecap="round">
+        <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+      </svg>
+    </div>
+    <div>
+      <span class="phase-badge" style="background:rgba(123,97,255,0.12);color:var(--phase2);border:1px solid rgba(123,97,255,0.3)">PHASE 02</span>
+      <h2 class="text-2xl font-bold mt-1" style="font-family:'Syne',sans-serif">PCAP Analysis Mastery</h2>
+    </div>
+  </div>
+
+  <!-- Attack analysis accordion cards -->
+  <div class="space-y-4">
+
+    <!-- ARP -->
+    <div class="card glow-card" style="border-color:rgba(123,97,255,0.2)">
+      <input type="checkbox" id="acc-arp" class="accordion-toggle"/>
+      <label for="acc-arp" class="accordion-label flex items-center justify-between p-5 cursor-pointer">
+        <div class="flex items-center gap-3">
+          <span class="pill" style="border-color:rgba(123,97,255,0.3);color:var(--phase2)">ARP</span>
+          <span class="font-semibold text-sm">ARP Poisoning & Spoofing</span>
+          <span class="pill" style="border-color:rgba(255,61,113,0.3);color:var(--phase6);font-size:0.65rem">HIGH RISK</span>
+        </div>
+        <svg class="chevron w-4 h-4" style="color:var(--muted)" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+      </label>
+      <div class="accordion-content border-t px-5 pb-5" style="border-color:var(--border)">
+        <div class="grid md:grid-cols-2 gap-6 mt-4">
+          <div>
+            <p class="text-xs font-semibold mb-2" style="color:var(--phase2);font-family:'JetBrains Mono',monospace">WHAT TO LOOK FOR</p>
+            <ul class="text-sm space-y-2" style="color:var(--muted)">
+              <li class="flex gap-2"><span style="color:var(--phase6)">▸</span> Duplicate ARP replies for same IP from different MACs</li>
+              <li class="flex gap-2"><span style="color:var(--phase6)">▸</span> Gratuitous ARP broadcasts (unsolicited)</li>
+              <li class="flex gap-2"><span style="color:var(--phase6)">▸</span> ARP reply without prior request (opcode=2, no matching opcode=1)</li>
+              <li class="flex gap-2"><span style="color:var(--phase6)">▸</span> Gateway IP resolving to non-gateway MAC</li>
+            </ul>
+            <p class="text-xs font-semibold mb-2 mt-4" style="color:var(--phase2);font-family:'JetBrains Mono',monospace">WIRESHARK FILTERS</p>
+            <div class="code-block text-xs">
+<span class="comment"># All ARP traffic</span><br/>
+<span class="keyword">arp</span><br/><br/>
+<span class="comment"># Duplicate IPs (ARP poison indicator)</span><br/>
+<span class="keyword">arp.duplicate-address-detected</span><br/><br/>
+<span class="comment"># Gratuitous ARP</span><br/>
+<span class="keyword">arp.isgratuitous == 1</span><br/><br/>
+<span class="comment"># ARP replies only</span><br/>
+<span class="keyword">arp.opcode == 2</span>
+            </div>
+          </div>
+          <div>
+            <p class="text-xs font-semibold mb-2" style="color:var(--phase2);font-family:'JetBrains Mono',monospace">TCPDUMP COMMANDS</p>
+            <div class="code-block text-xs">
+<span class="prompt">$</span> tcpdump -r arp.pcap -n <span class="keyword">arp</span> -v<br/><br/>
+<span class="comment"># See MAC:IP mappings</span><br/>
+<span class="prompt">$</span> tcpdump -r arp.pcap -n arp \<br/>
+&nbsp;&nbsp;| awk <span class="string">'{print $NF, $9}'</span> \<br/>
+&nbsp;&nbsp;| sort | uniq -c | sort -rn
+            </div>
+            <p class="text-xs font-semibold mb-2 mt-4" style="color:var(--phase2);font-family:'JetBrains Mono',monospace">KEY FIELDS</p>
+            <div class="space-y-1 text-xs" style="color:var(--muted)">
+              <div class="flex gap-2"><span class="font-mono" style="color:var(--accent)">arp.src.hw_mac</span> — sender hardware address</div>
+              <div class="flex gap-2"><span class="font-mono" style="color:var(--accent)">arp.src.proto_ipv4</span> — sender IP address</div>
+              <div class="flex gap-2"><span class="font-mono" style="color:var(--accent)">arp.opcode</span> — 1=request, 2=reply</div>
+              <div class="flex gap-2"><span class="font-mono" style="color:var(--accent)">eth.src</span> — Ethernet source MAC</div>
+            </div>
+          </div>
+        </div>
+        <!-- Exercise -->
+        <div class="mt-4 rounded-lg p-4" style="background:rgba(123,97,255,0.06);border:1px solid rgba(123,97,255,0.2)">
+          <p class="text-xs font-semibold mb-1" style="color:var(--phase2);font-family:'JetBrains Mono',monospace">🎯 HANDS-ON EXERCISE</p>
+          <p class="text-xs" style="color:var(--muted)">Load your ARP PCAP. Apply <code style="color:var(--accent)">arp.duplicate-address-detected</code>. Find which IP is being poisoned and which two MACs are claiming it. Document attacker MAC, victim IP, and timestamps. Write it in your analyst report.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- DNS Tunneling -->
+    <div class="card glow-card" style="border-color:rgba(255,107,53,0.2)">
+      <input type="checkbox" id="acc-dns" class="accordion-toggle"/>
+      <label for="acc-dns" class="accordion-label flex items-center justify-between p-5 cursor-pointer">
+        <div class="flex items-center gap-3">
+          <span class="pill" style="border-color:rgba(255,107,53,0.3);color:var(--phase3)">DNS</span>
+          <span class="font-semibold text-sm">DNS Tunneling & Enumeration</span>
+          <span class="pill" style="border-color:rgba(255,170,0,0.3);color:var(--phase5);font-size:0.65rem">CRITICAL</span>
+        </div>
+        <svg class="chevron w-4 h-4" style="color:var(--muted)" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+      </label>
+      <div class="accordion-content border-t px-5 pb-5" style="border-color:var(--border)">
+        <div class="grid md:grid-cols-2 gap-6 mt-4">
+          <div>
+            <p class="text-xs font-semibold mb-2" style="color:var(--phase3);font-family:'JetBrains Mono',monospace">TUNNEL INDICATORS</p>
+            <ul class="text-sm space-y-2" style="color:var(--muted)">
+              <li class="flex gap-2"><span style="color:var(--phase3)">▸</span> Unusually long subdomains (Base64-encoded payloads)</li>
+              <li class="flex gap-2"><span style="color:var(--phase3)">▸</span> High query volume to single domain</li>
+              <li class="flex gap-2"><span style="color:var(--phase3)">▸</span> TXT, NULL, CNAME record abuse</li>
+              <li class="flex gap-2"><span style="color:var(--phase3)">▸</span> Query length &gt; 100 chars — data exfil signal</li>
+              <li class="flex gap-2"><span style="color:var(--phase3)">▸</span> Requests for non-existent domains (NXDOMAIN storms)</li>
+            </ul>
+            <div class="code-block text-xs mt-4">
+<span class="comment"># DNS tunnel detection filters</span><br/>
+<span class="keyword">dns.qry.name.len > 50</span><br/>
+<span class="keyword">dns.qry.type == 16</span>  <span class="comment"># TXT records</span><br/>
+<span class="keyword">dns && frame.len > 512</span><br/>
+<span class="comment"># High freq same domain</span><br/>
+<span class="keyword">dns.qry.name contains "evilsite"</span>
+            </div>
+          </div>
+          <div>
+            <!-- DNS tunnel visual -->
+            <div class="diagram">
+              <p class="text-xs mb-3" style="color:var(--muted);font-family:'JetBrains Mono',monospace">// DNS TUNNEL FLOW</p>
+              <svg viewBox="0 0 280 120" xmlns="http://www.w3.org/2000/svg" style="width:100%">
+                <rect x="5" y="35" width="65" height="50" rx="6" fill="#0d1117" stroke="#ff6b35" stroke-width="1.2"/>
+                <text x="37" y="58" text-anchor="middle" fill="#ff6b35" font-size="9" font-family="JetBrains Mono">Victim</text>
+                <text x="37" y="73" text-anchor="middle" fill="#8b949e" font-size="7.5" font-family="JetBrains Mono">Host</text>
+                <path d="M70,55 L110,40" stroke="#ff6b35" stroke-width="1" stroke-dasharray="3,2" marker-end="url(#arr)"/>
+                <text x="85" y="44" fill="#ff6b35" font-size="7" font-family="JetBrains Mono">data.evil.com</text>
+                <rect x="112" y="20" width="65" height="50" rx="6" fill="#0d1117" stroke="#8b949e" stroke-width="1.2"/>
+                <text x="145" y="43" text-anchor="middle" fill="#cdd9e5" font-size="9" font-family="JetBrains Mono">DNS</text>
+                <text x="145" y="58" text-anchor="middle" fill="#8b949e" font-size="7.5" font-family="JetBrains Mono">Resolver</text>
+                <path d="M177,45 L215,55" stroke="#8b949e" stroke-width="1" stroke-dasharray="3,2" marker-end="url(#arr)"/>
+                <rect x="217" y="35" width="60" height="50" rx="6" fill="#0d1117" stroke="#ff3d71" stroke-width="1.2"/>
+                <text x="247" y="58" text-anchor="middle" fill="#ff3d71" font-size="9" font-family="JetBrains Mono">Attacker</text>
+                <text x="247" y="73" text-anchor="middle" fill="#8b949e" font-size="7.5" font-family="JetBrains Mono">C2 Server</text>
+                <text x="140" y="105" text-anchor="middle" fill="#ff6b35" font-size="8" font-family="JetBrains Mono">Data hidden in DNS queries ↑</text>
+              </svg>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ICMP -->
+    <div class="card glow-card" style="border-color:rgba(0,214,143,0.2)">
+      <input type="checkbox" id="acc-icmp" class="accordion-toggle"/>
+      <label for="acc-icmp" class="accordion-label flex items-center justify-between p-5 cursor-pointer">
+        <div class="flex items-center gap-3">
+          <span class="pill" style="border-color:rgba(0,214,143,0.3);color:var(--phase4)">ICMP</span>
+          <span class="font-semibold text-sm">ICMP Attacks — Smurf, Tunneling, Fragmentation</span>
+        </div>
+        <svg class="chevron w-4 h-4" style="color:var(--muted)" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+      </label>
+      <div class="accordion-content border-t px-5 pb-5" style="border-color:var(--border)">
+        <div class="grid md:grid-cols-3 gap-4 mt-4">
+          <div class="rounded-lg p-4" style="background:rgba(0,214,143,0.05);border:1px solid rgba(0,214,143,0.15)">
+            <p class="text-xs font-bold mb-2" style="color:var(--phase4);font-family:'JetBrains Mono',monospace">SMURF ATTACK</p>
+            <p class="text-xs mb-2" style="color:var(--muted)">Spoofed ICMP Echo Requests to broadcast address → amplified DoS</p>
+            <div class="code-block text-xs">
+<span class="keyword">icmp.type == 8</span><br/>
+<span class="comment"># + broadcast dst</span><br/>
+<span class="keyword">eth.dst == ff:ff:ff:ff:ff:ff</span><br/>
+<span class="comment"># + spoofed src</span><br/>
+<span class="keyword">ip.src == victim_ip</span>
+            </div>
+          </div>
+          <div class="rounded-lg p-4" style="background:rgba(0,214,143,0.05);border:1px solid rgba(0,214,143,0.15)">
+            <p class="text-xs font-bold mb-2" style="color:var(--phase4);font-family:'JetBrains Mono',monospace">ICMP TUNNEL</p>
+            <p class="text-xs mb-2" style="color:var(--muted)">Data in payload field — look for non-standard payloads &gt; 64 bytes</p>
+            <div class="code-block text-xs">
+<span class="keyword">icmp && data.len > 64</span><br/>
+<span class="keyword">icmp.type == 0 || 8</span><br/>
+<span class="comment"># Check payload bytes</span><br/>
+<span class="keyword">icmp contains "HTTP"</span>
+            </div>
+          </div>
+          <div class="rounded-lg p-4" style="background:rgba(0,214,143,0.05);border:1px solid rgba(0,214,143,0.15)">
+            <p class="text-xs font-bold mb-2" style="color:var(--phase4);font-family:'JetBrains Mono',monospace">FRAGMENTATION</p>
+            <p class="text-xs mb-2" style="color:var(--muted)">Overlapping fragments to bypass IDS — check ip.flags.mf and offsets</p>
+            <div class="code-block text-xs">
+<span class="keyword">ip.flags.mf == 1</span><br/>
+<span class="keyword">ip.frag_offset > 0</span><br/>
+<span class="comment"># Tiny fragments</span><br/>
+<span class="keyword">ip.len < 28</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Nmap -->
+    <div class="card glow-card" style="border-color:rgba(255,170,0,0.2)">
+      <input type="checkbox" id="acc-nmap" class="accordion-toggle"/>
+      <label for="acc-nmap" class="accordion-label flex items-center justify-between p-5 cursor-pointer">
+        <div class="flex items-center gap-3">
+          <span class="pill" style="border-color:rgba(255,170,0,0.3);color:var(--phase5)">NMAP</span>
+          <span class="font-semibold text-sm">Nmap Scans — SYN, ACK, FIN, NULL, Xmas, Frag Bypass</span>
+        </div>
+        <svg class="chevron w-4 h-4" style="color:var(--muted)" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
+      </label>
+      <div class="accordion-content border-t px-5 pb-5" style="border-color:var(--border)">
+        <!-- TCP Flags visual -->
+        <div class="diagram mt-4 mb-4">
+          <p class="text-xs mb-3" style="color:var(--muted);font-family:'JetBrains Mono',monospace">// NMAP SCAN TYPES — TCP FLAG PATTERNS</p>
+          <div class="overflow-x-auto">
+            <table style="width:100%;border-collapse:collapse;font-family:'JetBrains Mono',monospace;font-size:0.72rem">
+              <thead>
+                <tr style="border-bottom:1px solid var(--border)">
+                  <th class="text-left py-2 px-3" style="color:var(--muted)">Scan Type</th>
+                  <th class="text-left py-2 px-3" style="color:var(--muted)">Flags Set</th>
+                  <th class="text-left py-2 px-3" style="color:var(--muted)">Wireshark Filter</th>
+                  <th class="text-left py-2 px-3" style="color:var(--muted)">Purpose</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr style="border-bottom:1px solid rgba(30,45,61,0.5)">
+                  <td class="py-2 px-3" style="color:var(--phase5)">SYN Scan</td>
+                  <td class="py-2 px-3" style="color:var(--accent3)">SYN only</td>
+                  <td class="py-2 px-3" style="color:var(--accent)">tcp.flags == 0x002</td>
+                  <td class="py-2 px-3" style="color:var(--muted)">Port discovery, stealthy</td>
+                </tr>
+                <tr style="border-bottom:1px solid rgba(30,45,61,0.5)">
+                  <td class="py-2 px-3" style="color:var(--phase5)">ACK Scan</td>
+                  <td class="py-2 px-3" style="color:var(--accent3)">ACK only</td>
+                  <td class="py-2 px-3" style="color:var(--accent)">tcp.flags == 0x010</td>
+                  <td class="py-2 px-3" style="color:var(--muted)">Firewall mapping</td>
+                </tr>
+                <tr style="border-bottom:1px solid rgba(30,45,61,0.5)">
+                  <td class="py-2 px-3" style="color:var(--phase5)">FIN Scan</td>
+                  <td class="py-2 px-3" style="color:var(--accent3)">FIN only</td>
+                  <td class="py-2 px-3" style="color:var(--accent)">tcp.flags == 0x001</td>
+                  <td class="py-2 px-3" style="color:var(--muted)">IDS evasion</td>
+                </tr>
+                <tr style="border-bottom:1px solid rgba(30,45,61,0.5)">
+                  <td class="py-2 px-3" style="color:var(--phase5)">NULL Scan</td>
+                  <td class="py-2 px-3" style="color:var(--phase6)">No flags</td>
+                  <td class="py-2 px-3" style="color:var(--accent)">tcp.flags == 0x000</td>
+                  <td class="py-2 px-3" style="color:var(--muted)">IDS evasion</td>
+                </tr>
+                <tr>
+                  <td class="py-2 px-3" style="color:var(--phase5)">Xmas Scan</td>
+                  <td class="py-2 px-3" style="color:var(--phase6)">FIN+PSH+URG</td>
+                  <td class="py-2 px-3" style="color:var(--accent)">tcp.flags == 0x029</td>
+                  <td class="py-2 px-3" style="color:var(--muted)">OS fingerprinting</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div class="code-block text-xs">
+<span class="comment"># Detect port scan (multiple ports, single src)</span><br/>
+<span class="prompt">$</span> tcpdump -r nmap.pcap <span class="string">'tcp[tcpflags] == tcp-syn'</span> \<br/>
+&nbsp;&nbsp;| awk <span class="string">'{print $3}'</span> | cut -d. -f1-4 \<br/>
+&nbsp;&nbsp;| sort | uniq -c | sort -rn | head
+        </div>
+      </div>
+    </div>
+
+  </div><!-- end accordion group -->
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     PHASE 3 — DETECTION LOGIC
+═══════════════════════════════════════════════════════════════ -->
+<section id="phase3" class="mb-20">
+  <div class="flex items-center gap-4 mb-8">
+    <div class="w-12 h-12 rounded-xl flex items-center justify-center shrink-0" style="background:rgba(255,107,53,0.1);border:1px solid rgba(255,107,53,0.3)">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#ff6b35" stroke-width="2"><path d="M9 9l3-3 3 3"/><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+    </div>
+    <div>
+      <span class="phase-badge" style="background:rgba(255,107,53,0.12);color:var(--phase3);border:1px solid rgba(255,107,53,0.3)">PHASE 03</span>
+      <h2 class="text-2xl font-bold mt-1" style="font-family:'Syne',sans-serif">Detection Logic Framework</h2>
+    </div>
+  </div>
+
+  <!-- Detection thinking framework -->
+  <div class="diagram mb-6">
+    <p class="text-xs mb-4" style="color:var(--muted);font-family:'JetBrains Mono',monospace">// THE DETECTION ENGINEER THOUGHT PROCESS</p>
+    <svg viewBox="0 0 700 80" xmlns="http://www.w3.org/2000/svg" style="width:100%">
+      <defs>
+        <marker id="arr2" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
+          <path d="M0,0 L0,6 L6,3 z" fill="#ff6b35" opacity="0.6"/>
+        </marker>
+      </defs>
+      <rect x="5" y="15" width="120" height="50" rx="8" fill="#0d1117" stroke="#ff6b35" stroke-width="1.3"/>
+      <text x="65" y="38" text-anchor="middle" fill="#ff6b35" font-size="9" font-family="JetBrains Mono">What behavior</text>
+      <text x="65" y="52" text-anchor="middle" fill="#ff6b35" font-size="9" font-family="JetBrains Mono">are we detecting?</text>
+      <path d="M125,40 L155,40" stroke="#ff6b35" stroke-width="1" opacity="0.5" marker-end="url(#arr2)"/>
+      <rect x="158" y="15" width="130" height="50" rx="8" fill="#0d1117" stroke="#ffaa00" stroke-width="1.3"/>
+      <text x="223" y="38" text-anchor="middle" fill="#ffaa00" font-size="9" font-family="JetBrains Mono">What makes it</text>
+      <text x="223" y="52" text-anchor="middle" fill="#ffaa00" font-size="9" font-family="JetBrains Mono">malicious vs normal?</text>
+      <path d="M288,40 L318,40" stroke="#ff6b35" stroke-width="1" opacity="0.5" marker-end="url(#arr2)"/>
+      <rect x="320" y="15" width="130" height="50" rx="8" fill="#0d1117" stroke="#00d68f" stroke-width="1.3"/>
+      <text x="385" y="38" text-anchor="middle" fill="#00d68f" font-size="9" font-family="JetBrains Mono">What conditions</text>
+      <text x="385" y="52" text-anchor="middle" fill="#00d68f" font-size="9" font-family="JetBrains Mono">trigger an alert?</text>
+      <path d="M450,40 L480,40" stroke="#ff6b35" stroke-width="1" opacity="0.5" marker-end="url(#arr2)"/>
+      <rect x="482" y="15" width="130" height="50" rx="8" fill="#0d1117" stroke="#e040fb" stroke-width="1.3"/>
+      <text x="547" y="38" text-anchor="middle" fill="#e040fb" font-size="9" font-family="JetBrains Mono">How to minimize</text>
+      <text x="547" y="52" text-anchor="middle" fill="#e040fb" font-size="9" font-family="JetBrains Mono">false positives?</text>
+      <path d="M612,40 L645,40" stroke="#ff6b35" stroke-width="1" opacity="0.5" marker-end="url(#arr2)"/>
+      <rect x="647" y="15" width="50" height="50" rx="8" fill="#0d1117" stroke="#00e5ff" stroke-width="1.5"/>
+      <text x="672" y="38" text-anchor="middle" fill="#00e5ff" font-size="9" font-family="JetBrains Mono">WRITE</text>
+      <text x="672" y="52" text-anchor="middle" fill="#00e5ff" font-size="9" font-family="JetBrains Mono">RULE</text>
+    </svg>
+  </div>
+
+  <!-- Detection logic cards -->
+  <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+    <div class="card p-5 glow-card" style="border-color:rgba(255,107,53,0.15)">
+      <div class="flex items-center gap-2 mb-3">
+        <div class="w-8 h-8 rounded-lg flex items-center justify-center" style="background:rgba(255,107,53,0.12)">
+          <span style="font-size:1rem">🔍</span>
+        </div>
+        <span class="text-xs font-bold" style="color:var(--phase3);font-family:'JetBrains Mono',monospace">BEHAVIOR ANALYSIS</span>
+      </div>
+      <p class="text-xs" style="color:var(--muted)">Identify the exact primitive behavior: packet flags, payload patterns, rate, direction. Don't detect "hacking" — detect specific observable network actions.</p>
+    </div>
+    <div class="card p-5 glow-card" style="border-color:rgba(255,170,0,0.15)">
+      <div class="flex items-center gap-2 mb-3">
+        <div class="w-8 h-8 rounded-lg flex items-center justify-center" style="background:rgba(255,170,0,0.12)">
+          <span style="font-size:1rem">⚖️</span>
+        </div>
+        <span class="text-xs font-bold" style="color:var(--phase5);font-family:'JetBrains Mono',monospace">BASELINES MATTER</span>
+      </div>
+      <p class="text-xs" style="color:var(--muted)">What does normal DNS traffic look like? Normal ARP? Build baselines first. Anomalies only exist relative to normal.</p>
+    </div>
+    <div class="card p-5 glow-card" style="border-color:rgba(0,214,143,0.15)">
+      <div class="flex items-center gap-2 mb-3">
+        <div class="w-8 h-8 rounded-lg flex items-center justify-center" style="background:rgba(0,214,143,0.12)">
+          <span style="font-size:1rem">🎯</span>
+        </div>
+        <span class="text-xs font-bold" style="color:var(--phase4);font-family:'JetBrains Mono',monospace">THRESHOLDS</span>
+      </div>
+      <p class="text-xs" style="color:var(--muted)">1 NULL-flag packet = curiosity. 500 in 10 seconds = port scan. Detection logic must encode thresholds, not just patterns.</p>
+    </div>
+    <div class="card p-5 glow-card" style="border-color:rgba(224,64,251,0.15)">
+      <div class="flex items-center gap-2 mb-3">
+        <div class="w-8 h-8 rounded-lg flex items-center justify-center" style="background:rgba(224,64,251,0.12)">
+          <span style="font-size:1rem">🌐</span>
+        </div>
+        <span class="text-xs font-bold" style="color:var(--phase9);font-family:'JetBrains Mono',monospace">CONTEXT AWARE</span>
+      </div>
+      <p class="text-xs" style="color:var(--muted)">An ARP reply is normal. 50 unsolicited ARP replies from one host in 5s is not. Always add temporal and count context.</p>
+    </div>
+    <div class="card p-5 glow-card" style="border-color:rgba(0,180,216,0.15)">
+      <div class="flex items-center gap-2 mb-3">
+        <div class="w-8 h-8 rounded-lg flex items-center justify-center" style="background:rgba(0,180,216,0.12)">
+          <span style="font-size:1rem">📊</span>
+        </div>
+        <span class="text-xs font-bold" style="color:var(--phase8);font-family:'JetBrains Mono',monospace">FP vs FN TRADEOFF</span>
+      </div>
+      <p class="text-xs" style="color:var(--muted)">Loose rules = alert fatigue. Tight rules = missed attacks. Learn to tune: start tight, widen only with evidence.</p>
+    </div>
+    <div class="card p-5 glow-card" style="border-color:rgba(255,61,113,0.15)">
+      <div class="flex items-center gap-2 mb-3">
+        <div class="w-8 h-8 rounded-lg flex items-center justify-center" style="background:rgba(255,61,113,0.12)">
+          <span style="font-size:1rem">🔗</span>
+        </div>
+        <span class="text-xs font-bold" style="color:var(--phase6);font-family:'JetBrains Mono',monospace">CHAIN DETECTION</span>
+      </div>
+      <p class="text-xs" style="color:var(--muted)">Real attacks chain: recon → exploit → C2 → exfil. Detect the chain, not just one step. MITRE ATT&CK maps the sequence.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     PHASE 4 — RULE WRITING
+═══════════════════════════════════════════════════════════════ -->
+<section id="phase4" class="mb-20">
+  <div class="flex items-center gap-4 mb-8">
+    <div class="w-12 h-12 rounded-xl flex items-center justify-center shrink-0" style="background:rgba(0,214,143,0.1);border:1px solid rgba(0,214,143,0.3)">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#00d68f" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+    </div>
+    <div>
+      <span class="phase-badge" style="background:rgba(0,214,143,0.12);color:var(--phase4);border:1px solid rgba(0,214,143,0.3)">PHASE 04</span>
+      <h2 class="text-2xl font-bold mt-1" style="font-family:'Syne',sans-serif">Rule Writing — Snort · Suricata · Zeek</h2>
+    </div>
+  </div>
+
+  <!-- Rule anatomy diagram -->
+  <div class="card mb-6 p-6" style="border-color:rgba(0,214,143,0.2)">
+    <p class="text-xs font-semibold mb-4" style="color:var(--phase4);font-family:'JetBrains Mono',monospace">// SURICATA/SNORT RULE ANATOMY</p>
+    <div class="code-block text-xs mb-4">
+<span style="color:var(--phase6)">alert</span> <span style="color:var(--phase5)">tcp</span> <span style="color:var(--accent3)">$EXTERNAL_NET</span> <span style="color:var(--muted)">any</span> <span style="color:#fff">-></span> <span style="color:var(--accent3)">$HOME_NET</span> <span style="color:var(--muted)">any</span> <span style="color:var(--accent)">(</span><br/>
+&nbsp;&nbsp;<span style="color:var(--phase3)">msg:</span><span class="string">"NMAP SYN Scan Detected"</span>;<br/>
+&nbsp;&nbsp;<span style="color:var(--phase3)">flags:</span><span style="color:var(--accent3)">S,12</span>;<br/>
+&nbsp;&nbsp;<span style="color:var(--phase3)">flow:</span><span style="color:var(--accent3)">stateless</span>;<br/>
+&nbsp;&nbsp;<span style="color:var(--phase3)">threshold:</span><span style="color:var(--accent3)">type threshold, track by_src, count 30, seconds 10</span>;<br/>
+&nbsp;&nbsp;<span style="color:var(--phase3)">classtype:</span><span style="color:var(--accent3)">attempted-recon</span>;<br/>
+&nbsp;&nbsp;<span style="color:var(--phase3)">sid:</span><span style="color:var(--accent3)">9000001</span>;<br/>
+&nbsp;&nbsp;<span style="color:var(--phase3)">rev:</span><span style="color:var(--accent3)">1</span>;<br/>
+<span style="color:var(--accent)">)</span>
+    </div>
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+      <div class="rounded-lg p-3" style="background:rgba(255,61,113,0.06);border:1px solid rgba(255,61,113,0.15)">
+        <p class="text-xs font-bold mb-1" style="color:var(--phase6);font-family:'JetBrains Mono',monospace">ACTION</p>
+        <p class="text-xs" style="color:var(--muted)">alert / drop / pass / log — what to do when matched</p>
+      </div>
+      <div class="rounded-lg p-3" style="background:rgba(255,170,0,0.06);border:1px solid rgba(255,170,0,0.15)">
+        <p class="text-xs font-bold mb-1" style="color:var(--phase5);font-family:'JetBrains Mono',monospace">HEADER</p>
+        <p class="text-xs" style="color:var(--muted)">Protocol, src/dst IP, src/dst port, direction arrow</p>
+      </div>
+      <div class="rounded-lg p-3" style="background:rgba(0,214,143,0.06);border:1px solid rgba(0,214,143,0.15)">
+        <p class="text-xs font-bold mb-1" style="color:var(--phase4);font-family:'JetBrains Mono',monospace">OPTIONS</p>
+        <p class="text-xs" style="color:var(--muted)">msg, content, flags, flow, pcre, threshold, sid</p>
+      </div>
+      <div class="rounded-lg p-3" style="background:rgba(0,229,255,0.06);border:1px solid rgba(0,229,255,0.15)">
+        <p class="text-xs font-bold mb-1" style="color:var(--phase1);font-family:'JetBrains Mono',monospace">SID</p>
+        <p class="text-xs" style="color:var(--muted)">Unique rule ID. Custom rules: 9000001+. Never duplicate.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Rules per attack type tabs -->
+  <div class="grid md:grid-cols-3 gap-6">
+
+    <!-- Snort rules -->
+    <div class="card p-5 glow-card" style="border-color:rgba(255,170,0,0.2)">
+      <div class="flex items-center gap-2 mb-4">
+        <span class="phase-badge" style="background:rgba(255,170,0,0.12);color:var(--phase5)">SNORT</span>
+        <span class="text-xs font-semibold" style="color:var(--text)">ARP Poisoning Rule</span>
+      </div>
+      <div class="rule-block text-xs" style="border-left-color:var(--phase5)">
+<span style="color:var(--phase6)">alert</span> <span style="color:var(--phase5)">arp</span> any any <span style="color:#fff">-></span> any any <span style="color:var(--accent)">(</span><br/>
+&nbsp;&nbsp;<span style="color:var(--phase3)">msg:</span><span class="string">"ARP Poison - Gratuitous"</span>;<br/>
+&nbsp;&nbsp;<span style="color:var(--phase3)">arp-op:</span><span style="color:var(--accent3)">2</span>;<br/>
+&nbsp;&nbsp;<span style="color:var(--phase3)">sid:</span><span style="color:var(--accent3)">9000010</span>;<br/>
+<span style="color:var(--accent)">)</span>
+      </div>
+    </div>
+
+    <!-- Suricata rules -->
+    <div class="card p-5 glow-card" style="border-color:rgba(0,214,143,0.2)">
+      <div class="flex items-center gap-2 mb-4">
+        <span class="phase-badge" style="background:rgba(0,214,143,0.12);color:var(--phase4)">SURICATA</span>
+        <span class="text-xs font-semibold" style="color:var(--text)">DNS Tunnel Rule</span>
+      </div>
+      <div class="rule-block text-xs" style="border-left-color:var(--phase4)">
+<span style="color:var(--phase6)">alert</span> <span style="color:var(--phase5)">dns</span> any any <span style="color:#fff">-></span> any any <span style="color:var(--accent)">(</span><br/>
+&nbsp;&nbsp;<span style="color:var(--phase3)">msg:</span><span class="string">"DNS Tunnel Long Query"</span>;<br/>
+&nbsp;&nbsp;<span style="color:var(--phase3)">dns.query;</span><br/>
+&nbsp;&nbsp;<span style="color:var(--phase3)">pcre:</span><span class="string">"/^[a-z0-9]{40,}/i"</span>;<br/>
+&nbsp;&nbsp;<span style="color:var(--phase3)">threshold:</span><span style="color:var(--accent3)">type both,</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:var(--accent3)">track by_src,</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:var(--accent3)">count 10, seconds 60</span>;<br/>
+&nbsp;&nbsp;<span style="color:var(--phase3)">sid:</span><span style="color:var(--accent3)">9000020</span>;<br/>
+<span style="color:var(--accent)">)</span>
+      </div>
+    </div>
+
+    <!-- Zeek script -->
+    <div class="card p-5 glow-card" style="border-color:rgba(255,61,113,0.2)">
+      <div class="flex items-center gap-2 mb-4">
+        <span class="phase-badge" style="background:rgba(255,61,113,0.12);color:var(--phase6)">ZEEK</span>
+        <span class="text-xs font-semibold" style="color:var(--text)">Port Scan Detection</span>
+      </div>
+      <div class="rule-block text-xs" style="border-left-color:var(--phase6)">
+<span style="color:var(--accent3)">global</span> scan_table: <span style="color:var(--accent)">table</span><br/>
+&nbsp;&nbsp;[<span style="color:var(--phase5)">addr</span>] of <span style="color:var(--accent)">set</span>[<span style="color:var(--phase5)">port</span>]<br/>
+&nbsp;&nbsp;&amp;default = <span style="color:var(--accent)">set</span>();<br/><br/>
+<span style="color:var(--accent3)">event</span> connection_attempt(c: <span style="color:var(--phase5)">connection</span>) {<br/>
+&nbsp;&nbsp;add scan_table[c$id$orig_h][c$id$resp_p];<br/>
+&nbsp;&nbsp;<span style="color:var(--accent3)">if</span> (|scan_table[c$id$orig_h]| > <span style="color:var(--phase5)">50</span>)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;NOTICE([<span style="color:var(--phase3)">$note=</span>Scan::PortScan,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<span style="color:var(--phase3)">$msg=</span><span class="string">"Port scan detected"</span>]);<br/>
+}
+      </div>
+    </div>
+  </div>
+
+  <!-- Nmap rule set -->
+  <div class="card p-6 mt-6 glow-card" style="border-color:rgba(0,229,255,0.15)">
+    <p class="text-xs font-semibold mb-4" style="color:var(--phase1);font-family:'JetBrains Mono',monospace">// COMPLETE NMAP SCAN DETECTION RULESET (Suricata)</p>
+    <div class="grid md:grid-cols-2 gap-4">
+      <div class="rule-block text-xs">
+<span class="comment"># SYN Scan</span><br/>
+<span style="color:var(--phase6)">alert</span> tcp $EXT any <span style="color:#fff">-></span> $HOME any (<br/>
+&nbsp;&nbsp;<span style="color:var(--phase3)">msg:</span><span class="string">"NMAP SYN Scan"</span>;<br/>
+&nbsp;&nbsp;<span style="color:var(--phase3)">flags:</span>S,12;<br/>
+&nbsp;&nbsp;<span style="color:var(--phase3)">threshold:</span>type threshold,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;track by_src,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;count 30, seconds 10;<br/>
+&nbsp;&nbsp;<span style="color:var(--phase3)">sid:</span>9000100; <span style="color:var(--phase3)">rev:</span>1;)<br/><br/>
+<span class="comment"># NULL Scan (no flags)</span><br/>
+<span style="color:var(--phase6)">alert</span> tcp any any <span style="color:#fff">-></span> any any (<br/>
+&nbsp;&nbsp;<span style="color:var(--phase3)">msg:</span><span class="string">"NMAP NULL Scan"</span>;<br/>
+&nbsp;&nbsp;<span style="color:var(--phase3)">flags:</span>0;<br/>
+&nbsp;&nbsp;<span style="color:var(--phase3)">sid:</span>9000101; <span style="color:var(--phase3)">rev:</span>1;)
+      </div>
+      <div class="rule-block text-xs">
+<span class="comment"># Xmas Scan (FIN+PSH+URG)</span><br/>
+<span style="color:var(--phase6)">alert</span> tcp any any <span style="color:#fff">-></span> any any (<br/>
+&nbsp;&nbsp;<span style="color:var(--phase3)">msg:</span><span class="string">"NMAP Xmas Scan"</span>;<br/>
+&nbsp;&nbsp;<span style="color:var(--phase3)">flags:</span>FPU,12;<br/>
+&nbsp;&nbsp;<span style="color:var(--phase3)">sid:</span>9000102; <span style="color:var(--phase3)">rev:</span>1;)<br/><br/>
+<span class="comment"># ACK Scan (firewall mapping)</span><br/>
+<span style="color:var(--phase6)">alert</span> tcp $EXT any <span style="color:#fff">-></span> $HOME any (<br/>
+&nbsp;&nbsp;<span style="color:var(--phase3)">msg:</span><span class="string">"NMAP ACK Scan"</span>;<br/>
+&nbsp;&nbsp;<span style="color:var(--phase3)">flags:</span>A,12;<br/>
+&nbsp;&nbsp;<span style="color:var(--phase3)">threshold:</span>type threshold,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;track by_src, count 20, seconds 5;<br/>
+&nbsp;&nbsp;<span style="color:var(--phase3)">sid:</span>9000103; <span style="color:var(--phase3)">rev:</span>1;)
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     PHASE 5 — TESTING & VALIDATION
+═══════════════════════════════════════════════════════════════ -->
+<section id="phase5" class="mb-20">
+  <div class="flex items-center gap-4 mb-8">
+    <div class="w-12 h-12 rounded-xl flex items-center justify-center shrink-0" style="background:rgba(255,170,0,0.1);border:1px solid rgba(255,170,0,0.3)">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#ffaa00" stroke-width="2"><path d="M9 12l2 2 4-4"/><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"/></svg>
+    </div>
+    <div>
+      <span class="phase-badge" style="background:rgba(255,170,0,0.12);color:var(--phase5);border:1px solid rgba(255,170,0,0.3)">PHASE 05</span>
+      <h2 class="text-2xl font-bold mt-1" style="font-family:'Syne',sans-serif">Testing, Validation & Rule Tuning</h2>
+    </div>
+  </div>
+
+  <!-- FP vs FN diagram -->
+  <div class="diagram mb-6">
+    <p class="text-xs mb-3" style="color:var(--muted);font-family:'JetBrains Mono',monospace">// FALSE POSITIVE vs FALSE NEGATIVE MATRIX</p>
+    <svg viewBox="0 0 420 160" xmlns="http://www.w3.org/2000/svg" style="max-width:420px;width:100%">
+      <text x="180" y="20" text-anchor="middle" fill="#8b949e" font-size="10" font-family="JetBrains Mono">ACTUAL</text>
+      <text x="110" y="40" text-anchor="middle" fill="#00d68f" font-size="9" font-family="JetBrains Mono">ATTACK</text>
+      <text x="250" y="40" text-anchor="middle" fill="#8b949e" font-size="9" font-family="JetBrains Mono">NORMAL</text>
+      <text x="35" y="90" text-anchor="middle" fill="#00d68f" font-size="9" font-family="JetBrains Mono" transform="rotate(-90,35,90)">ALERT</text>
+      <text x="35" y="140" text-anchor="middle" fill="#8b949e" font-size="9" font-family="JetBrains Mono" transform="rotate(-90,35,140)">NO ALERT</text>
+      <!-- TP -->
+      <rect x="60" y="48" width="120" height="50" rx="6" fill="rgba(0,214,143,0.12)" stroke="#00d68f" stroke-width="1.2"/>
+      <text x="120" y="72" text-anchor="middle" fill="#00d68f" font-size="10" font-family="JetBrains Mono" font-weight="bold">TRUE POSITIVE</text>
+      <text x="120" y="88" text-anchor="middle" fill="#8b949e" font-size="8" font-family="JetBrains Mono">✓ Correct alert</text>
+      <!-- FP -->
+      <rect x="195" y="48" width="120" height="50" rx="6" fill="rgba(255,170,0,0.08)" stroke="#ffaa00" stroke-width="1.2"/>
+      <text x="255" y="72" text-anchor="middle" fill="#ffaa00" font-size="10" font-family="JetBrains Mono" font-weight="bold">FALSE POSITIVE</text>
+      <text x="255" y="88" text-anchor="middle" fill="#8b949e" font-size="8" font-family="JetBrains Mono">✗ Alert fatigue</text>
+      <!-- FN -->
+      <rect x="60" y="110" width="120" height="45" rx="6" fill="rgba(255,61,113,0.08)" stroke="#ff3d71" stroke-width="1.2"/>
+      <text x="120" y="131" text-anchor="middle" fill="#ff3d71" font-size="10" font-family="JetBrains Mono" font-weight="bold">FALSE NEGATIVE</text>
+      <text x="120" y="147" text-anchor="middle" fill="#8b949e" font-size="8" font-family="JetBrains Mono">✗ Missed attack!</text>
+      <!-- TN -->
+      <rect x="195" y="110" width="120" height="45" rx="6" fill="rgba(139,148,158,0.06)" stroke="rgba(139,148,158,0.3)" stroke-width="1.2"/>
+      <text x="255" y="131" text-anchor="middle" fill="#8b949e" font-size="10" font-family="JetBrains Mono" font-weight="bold">TRUE NEGATIVE</text>
+      <text x="255" y="147" text-anchor="middle" fill="#8b949e" font-size="8" font-family="JetBrains Mono">✓ Silent, correct</text>
+    </svg>
+  </div>
+
+  <div class="grid md:grid-cols-2 gap-6">
+    <div class="card p-6 glow-card">
+      <p class="text-xs font-semibold mb-3" style="color:var(--phase5);font-family:'JetBrains Mono',monospace">// VALIDATION WORKFLOW</p>
+      <div class="code-block text-xs">
+<span class="comment"># 1. Run PCAP against rules</span><br/>
+<span class="prompt">$</span> suricata -r pcaps/dns_tunnel.pcap \<br/>
+&nbsp;&nbsp;-S rules/suricata/dns.rules \<br/>
+&nbsp;&nbsp;-l logs/ --set outputs.1.enabled=yes<br/><br/>
+<span class="comment"># 2. Check EVE JSON for alerts</span><br/>
+<span class="prompt">$</span> cat logs/eve.json | jq \<br/>
+&nbsp;&nbsp;<span class="string">'select(.event_type=="alert")'</span><br/><br/>
+<span class="comment"># 3. Count alerts by rule SID</span><br/>
+<span class="prompt">$</span> cat logs/eve.json | jq -r \<br/>
+&nbsp;&nbsp;<span class="string">'.alert.signature_id'</span> | sort | uniq -c<br/><br/>
+<span class="comment"># 4. Debug non-firing rules</span><br/>
+<span class="prompt">$</span> suricata -T -c /etc/suricata/suricata.yaml \<br/>
+&nbsp;&nbsp;-S rules/custom.rules
+      </div>
+    </div>
+    <div class="card p-6 glow-card">
+      <p class="text-xs font-semibold mb-3" style="color:var(--phase5);font-family:'JetBrains Mono',monospace">// TUNING CHECKLIST</p>
+      <div class="space-y-3">
+        <div class="flex items-start gap-3">
+          <div class="w-5 h-5 rounded flex items-center justify-center shrink-0 mt-0.5" style="background:rgba(255,170,0,0.15);border:1px solid rgba(255,170,0,0.3)">
+            <span style="font-size:0.6rem;color:var(--phase5)">1</span>
+          </div>
+          <p class="text-xs" style="color:var(--muted)">Add whitelist for known-good IPs using <code style="color:var(--accent)">pass</code> rules before alert rules</p>
+        </div>
+        <div class="flex items-start gap-3">
+          <div class="w-5 h-5 rounded flex items-center justify-center shrink-0 mt-0.5" style="background:rgba(255,170,0,0.15);border:1px solid rgba(255,170,0,0.3)">
+            <span style="font-size:0.6rem;color:var(--phase5)">2</span>
+          </div>
+          <p class="text-xs" style="color:var(--muted)">Raise thresholds on noisy rules — increase count or shorten window</p>
+        </div>
+        <div class="flex items-start gap-3">
+          <div class="w-5 h-5 rounded flex items-center justify-center shrink-0 mt-0.5" style="background:rgba(255,170,0,0.15);border:1px solid rgba(255,170,0,0.3)">
+            <span style="font-size:0.6rem;color:var(--phase5)">3</span>
+          </div>
+          <p class="text-xs" style="color:var(--muted)">Use <code style="color:var(--accent)">detection-filter</code> to suppress alerts after first N in T seconds</p>
+        </div>
+        <div class="flex items-start gap-3">
+          <div class="w-5 h-5 rounded flex items-center justify-center shrink-0 mt-0.5" style="background:rgba(255,170,0,0.15);border:1px solid rgba(255,170,0,0.3)">
+            <span style="font-size:0.6rem;color:var(--phase5)">4</span>
+          </div>
+          <p class="text-xs" style="color:var(--muted)">Run rules against known-benign traffic — tune until FP rate &lt; 1%</p>
+        </div>
+        <div class="flex items-start gap-3">
+          <div class="w-5 h-5 rounded flex items-center justify-center shrink-0 mt-0.5" style="background:rgba(255,170,0,0.15);border:1px solid rgba(255,170,0,0.3)">
+            <span style="font-size:0.6rem;color:var(--phase5)">5</span>
+          </div>
+          <p class="text-xs" style="color:var(--muted)">Check <code style="color:var(--accent)">suricata.log</code> for parse errors — silent failures lose you detections</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     PHASE 6 — SIEM INTEGRATION
+═══════════════════════════════════════════════════════════════ -->
+<section id="phase6" class="mb-20">
+  <div class="flex items-center gap-4 mb-8">
+    <div class="w-12 h-12 rounded-xl flex items-center justify-center shrink-0" style="background:rgba(255,61,113,0.1);border:1px solid rgba(255,61,113,0.3)">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#ff3d71" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M2 20h20M7 20v-3M17 20v-3M12 20v-5"/></svg>
+    </div>
+    <div>
+      <span class="phase-badge" style="background:rgba(255,61,113,0.12);color:var(--phase6);border:1px solid rgba(255,61,113,0.3)">PHASE 06</span>
+      <h2 class="text-2xl font-bold mt-1" style="font-family:'Syne',sans-serif">Alert Pipeline & SIEM Integration</h2>
+    </div>
+  </div>
+
+  <!-- Log pipeline diagram -->
+  <div class="diagram mb-6">
+    <p class="text-xs mb-4" style="color:var(--muted);font-family:'JetBrains Mono',monospace">// ALERT PIPELINE: PCAP → SURICATA → FILEBEAT → ELASTICSEARCH → KIBANA</p>
+    <svg viewBox="0 0 700 70" xmlns="http://www.w3.org/2000/svg" style="width:100%">
+      <defs>
+        <marker id="arr3" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
+          <path d="M0,0 L0,6 L6,3 z" fill="#ff3d71" opacity="0.7"/>
+        </marker>
+      </defs>
+      <rect x="5" y="15" width="80" height="40" rx="6" fill="#0d1117" stroke="#ff6b35" stroke-width="1.3"/>
+      <text x="45" y="33" text-anchor="middle" fill="#ff6b35" font-size="9" font-family="JetBrains Mono">Suricata</text>
+      <text x="45" y="47" text-anchor="middle" fill="#8b949e" font-size="7.5" font-family="JetBrains Mono">eve.json</text>
+      <path d="M85,35 L115,35" stroke="#ff3d71" stroke-width="1" marker-end="url(#arr3)"/>
+      <rect x="118" y="15" width="80" height="40" rx="6" fill="#0d1117" stroke="#ffaa00" stroke-width="1.3"/>
+      <text x="158" y="33" text-anchor="middle" fill="#ffaa00" font-size="9" font-family="JetBrains Mono">Filebeat</text>
+      <text x="158" y="47" text-anchor="middle" fill="#8b949e" font-size="7.5" font-family="JetBrains Mono">shipper</text>
+      <path d="M198,35 L228,35" stroke="#ff3d71" stroke-width="1" marker-end="url(#arr3)"/>
+      <rect x="230" y="15" width="95" height="40" rx="6" fill="#0d1117" stroke="#00d68f" stroke-width="1.3"/>
+      <text x="278" y="33" text-anchor="middle" fill="#00d68f" font-size="9" font-family="JetBrains Mono">Logstash</text>
+      <text x="278" y="47" text-anchor="middle" fill="#8b949e" font-size="7.5" font-family="JetBrains Mono">parse/enrich</text>
+      <path d="M325,35 L355,35" stroke="#ff3d71" stroke-width="1" marker-end="url(#arr3)"/>
+      <rect x="357" y="15" width="100" height="40" rx="6" fill="#0d1117" stroke="#7b61ff" stroke-width="1.3"/>
+      <text x="407" y="33" text-anchor="middle" fill="#7b61ff" font-size="9" font-family="JetBrains Mono">Elasticsearch</text>
+      <text x="407" y="47" text-anchor="middle" fill="#8b949e" font-size="7.5" font-family="JetBrains Mono">index + store</text>
+      <path d="M457,35 L487,35" stroke="#ff3d71" stroke-width="1" marker-end="url(#arr3)"/>
+      <rect x="489" y="15" width="80" height="40" rx="6" fill="#0d1117" stroke="#00e5ff" stroke-width="1.3"/>
+      <text x="529" y="33" text-anchor="middle" fill="#00e5ff" font-size="9" font-family="JetBrains Mono">Kibana</text>
+      <text x="529" y="47" text-anchor="middle" fill="#8b949e" font-size="7.5" font-family="JetBrains Mono">dashboards</text>
+      <path d="M569,35 L599,35" stroke="#ff3d71" stroke-width="1" marker-end="url(#arr3)"/>
+      <rect x="601" y="15" width="90" height="40" rx="6" fill="#0d1117" stroke="#ff3d71" stroke-width="1.3"/>
+      <text x="646" y="33" text-anchor="middle" fill="#ff3d71" font-size="9" font-family="JetBrains Mono">SOC Analyst</text>
+      <text x="646" y="47" text-anchor="middle" fill="#8b949e" font-size="7.5" font-family="JetBrains Mono">investigate</text>
+    </svg>
+  </div>
+
+  <div class="grid md:grid-cols-2 gap-6">
+    <div class="card p-6 glow-card">
+      <p class="text-xs font-semibold mb-3" style="color:var(--phase6);font-family:'JetBrains Mono',monospace">// FILEBEAT CONFIG (suricata module)</p>
+      <div class="code-block text-xs">
+<span class="comment"># /etc/filebeat/filebeat.yml</span><br/>
+<span class="tag">filebeat.inputs:</span><br/>
+- <span class="tag">type:</span> <span class="value">log</span><br/>
+&nbsp;&nbsp;<span class="tag">enabled:</span> <span class="value">true</span><br/>
+&nbsp;&nbsp;<span class="tag">paths:</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;- <span class="string">/var/log/suricata/eve.json</span><br/>
+&nbsp;&nbsp;<span class="tag">json.keys_under_root:</span> <span class="value">true</span><br/>
+&nbsp;&nbsp;<span class="tag">json.add_error_key:</span> <span class="value">true</span><br/><br/>
+<span class="tag">output.elasticsearch:</span><br/>
+&nbsp;&nbsp;<span class="tag">hosts:</span> [<span class="string">"localhost:9200"</span>]<br/>
+&nbsp;&nbsp;<span class="tag">index:</span> <span class="string">"suricata-%{+yyyy.MM.dd}"</span>
+      </div>
+    </div>
+    <div class="card p-6 glow-card">
+      <p class="text-xs font-semibold mb-3" style="color:var(--phase6);font-family:'JetBrains Mono',monospace">// KIBANA QUERY — ALERT TRIAGE</p>
+      <div class="code-block text-xs">
+<span class="comment"># KQL: Find all IDS alerts today</span><br/>
+<span class="keyword">event_type: "alert"</span> <span class="value">AND</span><br/>
+<span class="keyword">timestamp:</span> [<span class="string">now-24h</span> TO <span class="string">now</span>]<br/><br/>
+<span class="comment"># Filter by severity</span><br/>
+<span class="keyword">alert.severity: 1</span><br/><br/>
+<span class="comment"># Group by signature</span><br/>
+<span class="comment"># In Kibana: Aggregations</span><br/>
+<span class="comment"># Terms → alert.signature</span><br/>
+<span class="comment"># Sort by count desc</span><br/><br/>
+<span class="comment"># Pivot on attacker IP</span><br/>
+<span class="keyword">src_ip: "192.168.1.50"</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     PHASE 7 — THREAT HUNTING
+═══════════════════════════════════════════════════════════════ -->
+<section id="phase7" class="mb-20">
+  <div class="flex items-center gap-4 mb-8">
+    <div class="w-12 h-12 rounded-xl flex items-center justify-center shrink-0" style="background:rgba(168,255,120,0.1);border:1px solid rgba(168,255,120,0.3)">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#a8ff78" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+    </div>
+    <div>
+      <span class="phase-badge" style="background:rgba(168,255,120,0.12);color:var(--phase7);border:1px solid rgba(168,255,120,0.3)">PHASE 07</span>
+      <h2 class="text-2xl font-bold mt-1" style="font-family:'Syne',sans-serif">Threat Hunting & Analysis</h2>
+    </div>
+  </div>
+
+  <!-- Hunting methodology -->
+  <div class="grid md:grid-cols-4 gap-4 mb-6">
+    <div class="card p-5 text-center glow-card" style="border-color:rgba(168,255,120,0.15)">
+      <div class="text-2xl mb-2">🔭</div>
+      <p class="text-xs font-bold mb-1" style="color:var(--phase7);font-family:'JetBrains Mono',monospace">HYPOTHESIS</p>
+      <p class="text-xs" style="color:var(--muted)">Start with a theory based on threat intel or anomaly</p>
+    </div>
+    <div class="card p-5 text-center glow-card" style="border-color:rgba(168,255,120,0.15)">
+      <div class="text-2xl mb-2">🔍</div>
+      <p class="text-xs font-bold mb-1" style="color:var(--phase7);font-family:'JetBrains Mono',monospace">INVESTIGATE</p>
+      <p class="text-xs" style="color:var(--muted)">Search logs, pivot on IPs, domains, ports</p>
+    </div>
+    <div class="card p-5 text-center glow-card" style="border-color:rgba(168,255,120,0.15)">
+      <div class="text-2xl mb-2">📍</div>
+      <p class="text-xs font-bold mb-1" style="color:var(--phase7);font-family:'JetBrains Mono',monospace">TIMELINE</p>
+      <p class="text-xs" style="color:var(--muted)">Build attack timeline: first contact → lateral → exfil</p>
+    </div>
+    <div class="card p-5 text-center glow-card" style="border-color:rgba(168,255,120,0.15)">
+      <div class="text-2xl mb-2">📝</div>
+      <p class="text-xs font-bold mb-1" style="color:var(--phase7);font-family:'JetBrains Mono',monospace">DOCUMENT</p>
+      <p class="text-xs" style="color:var(--muted)">IOCs, MITRE techniques, affected assets, remediation</p>
+    </div>
+  </div>
+
+  <div class="card p-6 glow-card">
+    <p class="text-xs font-semibold mb-3" style="color:var(--phase7);font-family:'JetBrains Mono',monospace">// HUNT QUERY — DNS EXFIL (Zeek dns.log)</p>
+    <div class="code-block text-xs">
+<span class="comment"># Find large DNS responses (data exfil indicator)</span><br/>
+<span class="prompt">$</span> cat dns.log | zeek-cut id.orig_h query answers \<br/>
+&nbsp;&nbsp;| awk <span class="string">'length($2) > 50 {print}'</span><br/><br/>
+<span class="comment"># Hunt for Base64-ish subdomain patterns</span><br/>
+<span class="prompt">$</span> cat dns.log | zeek-cut query \<br/>
+&nbsp;&nbsp;| grep -E <span class="string">'[a-zA-Z0-9+/]{20,}\.'</span> \<br/>
+&nbsp;&nbsp;| sort | uniq -c | sort -rn<br/><br/>
+<span class="comment"># Identify beaconing (regular-interval connections)</span><br/>
+<span class="prompt">$</span> cat conn.log | zeek-cut id.orig_h id.resp_h ts \<br/>
+&nbsp;&nbsp;| awk <span class="string">'{print $1,$2,int($3/60)}'</span> \<br/>
+&nbsp;&nbsp;| sort | uniq -c | sort -rn | head -20
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     PHASE 8 — REAL-WORLD WORKFLOW
+═══════════════════════════════════════════════════════════════ -->
+<section id="phase8" class="mb-20">
+  <div class="flex items-center gap-4 mb-8">
+    <div class="w-12 h-12 rounded-xl flex items-center justify-center shrink-0" style="background:rgba(0,180,216,0.1);border:1px solid rgba(0,180,216,0.3)">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#00b4d8" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+    </div>
+    <div>
+      <span class="phase-badge" style="background:rgba(0,180,216,0.12);color:var(--phase8);border:1px solid rgba(0,180,216,0.3)">PHASE 08</span>
+      <h2 class="text-2xl font-bold mt-1" style="font-family:'Syne',sans-serif">Real-World SOC Workflow Simulation</h2>
+    </div>
+  </div>
+
+  <!-- Simulated alert -->
+  <div class="card mb-6 overflow-hidden" style="border-color:rgba(255,61,113,0.3)">
+    <div class="p-3 flex items-center gap-2" style="background:rgba(255,61,113,0.08);border-bottom:1px solid rgba(255,61,113,0.2)">
+      <span class="inline-block w-2 h-2 rounded-full bg-red-400 animate-pulse"></span>
+      <span class="text-xs font-bold" style="color:var(--phase6);font-family:'JetBrains Mono',monospace">LIVE ALERT — SEVERITY 1 — CRITICAL</span>
+    </div>
+    <div class="p-5 alert-sim">
+      <div class="grid md:grid-cols-3 gap-4 text-xs font-mono">
+        <div><span style="color:var(--muted)">SIGNATURE:</span><br/><span style="color:var(--accent3)">ET SCAN Nmap SYN Sweep</span></div>
+        <div><span style="color:var(--muted)">SRC IP:</span><br/><span style="color:var(--phase6)">192.168.1.50:random</span></div>
+        <div><span style="color:var(--muted)">DST:</span><br/><span style="color:var(--accent)">192.168.1.0/24:multiple</span></div>
+        <div><span style="color:var(--muted)">TIMESTAMP:</span><br/><span style="color:var(--text)">2024-01-15T14:32:11Z</span></div>
+        <div><span style="color:var(--muted)">PROTOCOL:</span><br/><span style="color:var(--phase5)">TCP / SYN flags only</span></div>
+        <div><span style="color:var(--muted)">COUNT:</span><br/><span style="color:var(--phase6)">347 packets / 10s</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Triage steps -->
+  <div class="relative pl-16">
+    <div class="timeline-line"></div>
+    <div class="space-y-6">
+      <div class="relative">
+        <div class="absolute -left-10 top-1 w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold" style="background:#0d1117;border:2px solid var(--phase8);color:var(--phase8);font-family:'JetBrains Mono',monospace">1</div>
+        <div class="card p-5 glow-card">
+          <p class="text-xs font-bold mb-1" style="color:var(--phase8);font-family:'JetBrains Mono',monospace">DETECTION — Alert fires in SIEM</p>
+          <p class="text-xs" style="color:var(--muted)">Suricata fires rule SID:9000100. EVE JSON written to disk. Filebeat ships to Elasticsearch. Kibana dashboard shows severity-1 alert. On-call analyst paged.</p>
+        </div>
+      </div>
+      <div class="relative">
+        <div class="absolute -left-10 top-1 w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold" style="background:#0d1117;border:2px solid var(--phase5);color:var(--phase5);font-family:'JetBrains Mono',monospace">2</div>
+        <div class="card p-5 glow-card">
+          <p class="text-xs font-bold mb-1" style="color:var(--phase5);font-family:'JetBrains Mono',monospace">TRIAGE — Confirm it's real</p>
+          <p class="text-xs" style="color:var(--muted)">Check src IP: 192.168.1.50. Is it in asset inventory? Is it a scanner (Nessus/Qualys)? If no — escalate. Pivot: what other alerts from this IP in last 24h?</p>
+        </div>
+      </div>
+      <div class="relative">
+        <div class="absolute -left-10 top-1 w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold" style="background:#0d1117;border:2px solid var(--phase3);color:var(--phase3);font-family:'JetBrains Mono',monospace">3</div>
+        <div class="card p-5 glow-card">
+          <p class="text-xs font-bold mb-1" style="color:var(--phase3);font-family:'JetBrains Mono',monospace">INVESTIGATION — Deep dive</p>
+          <p class="text-xs" style="color:var(--muted)">Pull Zeek conn.log for src IP. How many unique dst IPs? What ports targeted? Any successful connections? Check DNS logs for C2 indicators. Check auth logs for lateral movement.</p>
+        </div>
+      </div>
+      <div class="relative">
+        <div class="absolute -left-10 top-1 w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold" style="background:#0d1117;border:2px solid var(--phase6);color:var(--phase6);font-family:'JetBrains Mono',monospace">4</div>
+        <div class="card p-5 glow-card">
+          <p class="text-xs font-bold mb-1" style="color:var(--phase6);font-family:'JetBrains Mono',monospace">RESPONSE — Contain & remediate</p>
+          <p class="text-xs" style="color:var(--muted)">Block src IP at firewall. Isolate host if compromised. Preserve evidence (pcap dump). Notify incident response team. Open ticket with full timeline and IOCs.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     PHASE 9 — PRACTICE LAB
+═══════════════════════════════════════════════════════════════ -->
+<section id="phase9" class="mb-20">
+  <div class="flex items-center gap-4 mb-8">
+    <div class="w-12 h-12 rounded-xl flex items-center justify-center shrink-0" style="background:rgba(224,64,251,0.1);border:1px solid rgba(224,64,251,0.3)">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#e040fb" stroke-width="2"><path d="M14.5 10c-.83 0-1.5-.67-1.5-1.5v-5c0-.83.67-1.5 1.5-1.5s1.5.67 1.5 1.5v5c0 .83-.67 1.5-1.5 1.5z"/><path d="M20.5 10H19V8.5c0-.83.67-1.5 1.5-1.5s1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/><path d="M9.5 14c.83 0 1.5.67 1.5 1.5v5c0 .83-.67 1.5-1.5 1.5S8 21.33 8 20.5v-5c0-.83.67-1.5 1.5-1.5z"/><path d="M3.5 14H5v1.5c0 .83-.67 1.5-1.5 1.5S2 16.33 2 15.5 2.67 14 3.5 14z"/><path d="M14 14.5c0-.83.67-1.5 1.5-1.5h5c.83 0 1.5.67 1.5 1.5s-.67 1.5-1.5 1.5h-5c-.83 0-1.5-.67-1.5-1.5z"/><path d="M15.5 19H14v1.5c0 .83.67 1.5 1.5 1.5s1.5-.67 1.5-1.5-.67-1.5-1.5-1.5z"/><path d="M10 9.5C10 8.67 9.33 8 8.5 8h-5C2.67 8 2 8.67 2 9.5S2.67 11 3.5 11h5c.83 0 1.5-.67 1.5-1.5z"/><path d="M8.5 5H10V3.5C10 2.67 9.33 2 8.5 2S7 2.67 7 3.5 7.67 5 8.5 5z"/></svg>
+    </div>
+    <div>
+      <span class="phase-badge" style="background:rgba(224,64,251,0.12);color:var(--phase9);border:1px solid rgba(224,64,251,0.3)">PHASE 09</span>
+      <h2 class="text-2xl font-bold mt-1" style="font-family:'Syne',sans-serif">Practice Challenges & Exercises</h2>
+    </div>
+  </div>
+
+  <div class="grid md:grid-cols-3 gap-4">
+    <!-- Beginner -->
+    <div class="card p-6 glow-card" style="border-color:rgba(0,214,143,0.2)">
+      <div class="flex items-center justify-between mb-4">
+        <span class="phase-badge" style="background:rgba(0,214,143,0.12);color:var(--phase4)">BEGINNER</span>
+        <span class="text-xs" style="color:var(--muted);font-family:'JetBrains Mono',monospace">3 challenges</span>
+      </div>
+      <div class="space-y-4">
+        <div class="rounded-lg p-3" style="background:rgba(0,214,143,0.05);border:1px solid rgba(0,214,143,0.15)">
+          <p class="text-xs font-bold mb-1" style="color:var(--phase4)">B-01: ARP Hunt</p>
+          <p class="text-xs" style="color:var(--muted)">Load arp_poison.pcap. Identify the attacker MAC, victim IP, and time of first poison attempt.</p>
+        </div>
+        <div class="rounded-lg p-3" style="background:rgba(0,214,143,0.05);border:1px solid rgba(0,214,143,0.15)">
+          <p class="text-xs font-bold mb-1" style="color:var(--phase4)">B-02: TCP Flags</p>
+          <p class="text-xs" style="color:var(--muted)">Filter nmap.pcap for all NULL scan packets. How many unique destination ports were probed?</p>
+        </div>
+        <div class="rounded-lg p-3" style="background:rgba(0,214,143,0.05);border:1px solid rgba(0,214,143,0.15)">
+          <p class="text-xs font-bold mb-1" style="color:var(--phase4)">B-03: ICMP Size</p>
+          <p class="text-xs" style="color:var(--muted)">In icmp_tunnel.pcap, find packets with payload &gt; 64 bytes. What data is in the payload?</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Intermediate -->
+    <div class="card p-6 glow-card" style="border-color:rgba(255,170,0,0.2)">
+      <div class="flex items-center justify-between mb-4">
+        <span class="phase-badge" style="background:rgba(255,170,0,0.12);color:var(--phase5)">INTERMEDIATE</span>
+        <span class="text-xs" style="color:var(--muted);font-family:'JetBrains Mono',monospace">3 challenges</span>
+      </div>
+      <div class="space-y-4">
+        <div class="rounded-lg p-3" style="background:rgba(255,170,0,0.05);border:1px solid rgba(255,170,0,0.15)">
+          <p class="text-xs font-bold mb-1" style="color:var(--phase5)">I-01: Write DNS Rule</p>
+          <p class="text-xs" style="color:var(--muted)">Write a Suricata rule that catches DNS queries with subdomains longer than 40 chars. Include threshold: 5 in 60s.</p>
+        </div>
+        <div class="rounded-lg p-3" style="background:rgba(255,170,0,0.05);border:1px solid rgba(255,170,0,0.15)">
+          <p class="text-xs font-bold mb-1" style="color:var(--phase5)">I-02: Tune Noisy Rule</p>
+          <p class="text-xs" style="color:var(--muted)">A Snort SYN rule fires 2000 times/hour from internal scanners. Add a pass rule and suppress for RFC1918 sources.</p>
+        </div>
+        <div class="rounded-lg p-3" style="background:rgba(255,170,0,0.05);border:1px solid rgba(255,170,0,0.15)">
+          <p class="text-xs font-bold mb-1" style="color:var(--phase5)">I-03: Zeek Script</p>
+          <p class="text-xs" style="color:var(--muted)">Write a Zeek script that logs a NOTICE when one IP connects to more than 100 unique ports in under 30 seconds.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Advanced -->
+    <div class="card p-6 glow-card" style="border-color:rgba(255,61,113,0.2)">
+      <div class="flex items-center justify-between mb-4">
+        <span class="phase-badge" style="background:rgba(255,61,113,0.12);color:var(--phase6)">ADVANCED</span>
+        <span class="text-xs" style="color:var(--muted);font-family:'JetBrains Mono',monospace">3 challenges</span>
+      </div>
+      <div class="space-y-4">
+        <div class="rounded-lg p-3" style="background:rgba(255,61,113,0.05);border:1px solid rgba(255,61,113,0.15)">
+          <p class="text-xs font-bold mb-1" style="color:var(--phase6)">A-01: Full Chain</p>
+          <p class="text-xs" style="color:var(--muted)">Analyze all provided PCAPs. Identify an attacker that did recon, then exploitation. Build the full attack chain timeline.</p>
+        </div>
+        <div class="rounded-lg p-3" style="background:rgba(255,61,113,0.05);border:1px solid rgba(255,61,113,0.15)">
+          <p class="text-xs font-bold mb-1" style="color:var(--phase6)">A-02: Rule Suite</p>
+          <p class="text-xs" style="color:var(--muted)">Write a complete ruleset (Suricata + Zeek) covering all 12 attack types in the dataset. Validate each rule fires on its PCAP.</p>
+        </div>
+        <div class="rounded-lg p-3" style="background:rgba(255,61,113,0.05);border:1px solid rgba(255,61,113,0.15)">
+          <p class="text-xs font-bold mb-1" style="color:var(--phase6)">A-03: SIEM Hunt</p>
+          <p class="text-xs" style="color:var(--muted)">Ingest all PCAPs into ELK. Build a Kibana dashboard with 6 visualizations. Identify top attacker, top victim, attack timeline.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── FOOTER ─────────────────────────────────────────────────── -->
+<footer class="mt-20 pt-8" style="border-top:1px solid var(--border)">
+  <div class="flex flex-col md:flex-row items-center justify-between gap-4">
+    <div>
+      <p class="text-xs font-bold" style="font-family:'JetBrains Mono',monospace;color:var(--accent)">SOCMASTER TRAINING PROGRAM</p>
+      <p class="text-xs mt-1" style="color:var(--muted)">Senior SOC Analyst Mentorship — 9 Phases · Intermediate → Advanced</p>
+    </div>
+    <div class="flex items-center gap-4">
+      <span class="pill" style="border-color:rgba(0,214,143,0.3);color:var(--phase4)">Suricata</span>
+      <span class="pill" style="border-color:rgba(255,170,0,0.3);color:var(--phase5)">Snort</span>
+      <span class="pill" style="border-color:rgba(255,61,113,0.3);color:var(--phase6)">Zeek</span>
+      <span class="pill" style="border-color:rgba(123,97,255,0.3);color:var(--phase2)">ELK Stack</span>
+    </div>
+  </div>
+  <p class="text-xs mt-6 text-center" style="color:rgba(139,148,158,0.5);font-family:'JetBrains Mono',monospace">// END OF TRAINING DOCUMENT — COMMIT TO MEMORY. OPERATE WITHOUT GUIDANCE.</p>
+</footer>
+
+</div><!-- end max-w container -->
+</body>
+</html>

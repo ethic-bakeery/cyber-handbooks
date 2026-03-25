@@ -1,0 +1,1189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Security Onion — Complete SOC Training</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Oxanium:wght@300;400;600;700;800&family=Source+Code+Pro:wght@400;600&family=Lora:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --bg:      #0b0e08;
+  --surface: #111510;
+  --card:    #161b12;
+  --border:  #2a3322;
+  --accent:  #7ec850;   /* onion green */
+  --gold:    #d4a843;   /* amber ops */
+  --red:     #e05a3a;   /* alert red */
+  --blue:    #5ab3d4;   /* elastic blue */
+  --purple:  #9b72cf;   /* kibana purple */
+  --teal:    #4ecdc4;   /* zeek teal */
+  --text:    #c8d4bc;
+  --muted:   #6b7f60;
+  --dim:     #3d4f35;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  background:var(--bg);
+  color:var(--text);
+  font-family:'Lora',serif;
+  font-size:15px;
+  line-height:1.75;
+  overflow-x:hidden;
+}
+/* Dot matrix bg */
+body::before{
+  content:'';
+  position:fixed;inset:0;
+  background-image:radial-gradient(circle, rgba(126,200,80,0.06) 1px, transparent 1px);
+  background-size:28px 28px;
+  pointer-events:none;z-index:0;
+}
+/* Vignette */
+body::after{
+  content:'';
+  position:fixed;inset:0;
+  background:radial-gradient(ellipse at center, transparent 50%, rgba(11,14,8,0.7) 100%);
+  pointer-events:none;z-index:0;
+}
+h1,h2,h3,h4{font-family:'Oxanium',sans-serif}
+code,pre,.mono{font-family:'Source Code Pro',monospace}
+
+.hero-title{
+  font-size:clamp(2rem,5.5vw,4.2rem);
+  font-weight:800;
+  line-height:1.08;
+  letter-spacing:-0.5px;
+}
+.glow-g{ text-shadow:0 0 25px rgba(126,200,80,0.5),0 0 50px rgba(126,200,80,0.2); }
+.glow-a{ text-shadow:0 0 25px rgba(212,168,67,0.5); }
+
+/* Cards */
+.card{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:10px;
+  position:relative;
+  overflow:hidden;
+  transition:border-color .25s, box-shadow .25s;
+}
+.card::before{
+  content:'';
+  position:absolute;inset:0;
+  background:linear-gradient(135deg,rgba(126,200,80,0.02) 0%,transparent 60%);
+  pointer-events:none;
+}
+.card:hover{
+  border-color:rgba(126,200,80,0.3);
+  box-shadow:0 0 20px rgba(126,200,80,0.06);
+}
+
+/* Code blocks */
+.cb{
+  background:#080c06;
+  border:1px solid var(--border);
+  border-left:3px solid var(--accent);
+  border-radius:0 8px 8px 0;
+  padding:1rem 1.25rem;
+  font-family:'Source Code Pro',monospace;
+  font-size:.78rem;
+  line-height:1.9;
+  overflow-x:auto;
+}
+.cb.amber{border-left-color:var(--gold);}
+.cb.red{border-left-color:var(--red);}
+.cb.blue{border-left-color:var(--blue);}
+.cb.purple{border-left-color:var(--purple);}
+.cb.teal{border-left-color:var(--teal);}
+
+.k{color:var(--accent)}
+.g{color:var(--gold)}
+.r{color:var(--red)}
+.b{color:var(--blue)}
+.p{color:var(--purple)}
+.t{color:var(--teal)}
+.cm{color:var(--muted)}
+.s{color:#c9956a}
+.pr{color:var(--accent);opacity:.7}
+
+/* Phase badges */
+.pbadge{
+  font-family:'Oxanium',sans-serif;
+  font-size:.62rem;
+  font-weight:700;
+  letter-spacing:2.5px;
+  text-transform:uppercase;
+  padding:2px 10px;
+  border-radius:3px;
+}
+
+/* Component pills */
+.cpill{
+  display:inline-flex;align-items:center;gap:5px;
+  font-family:'Source Code Pro',monospace;
+  font-size:.68rem;
+  padding:3px 10px;
+  border-radius:20px;
+  border:1px solid;
+  white-space:nowrap;
+}
+
+/* Section number */
+.snum{
+  font-family:'Oxanium',sans-serif;
+  font-size:.65rem;
+  letter-spacing:3px;
+  color:var(--muted);
+  text-transform:uppercase;
+}
+
+/* Accordion */
+.acc-in{display:none}
+.acc-in:checked+.acc-lbl+.acc-body{display:block}
+.acc-lbl{cursor:pointer;user-select:none}
+.acc-in{display:none}
+.acc-lbl .chev{transition:transform .3s}
+.acc-in:checked+.acc-lbl .chev{transform:rotate(180deg)}
+
+/* Animated pulse ring */
+@keyframes ring{
+  0%{box-shadow:0 0 0 0 rgba(126,200,80,0.4)}
+  70%{box-shadow:0 0 0 10px rgba(126,200,80,0)}
+  100%{box-shadow:0 0 0 0 rgba(126,200,80,0)}
+}
+.ring{animation:ring 2s ease-out infinite}
+
+/* Timeline */
+.tl-line{
+  position:absolute;left:22px;top:0;bottom:0;
+  width:1.5px;
+  background:linear-gradient(to bottom,var(--accent),var(--gold),var(--teal));
+  opacity:.25;
+}
+
+/* Alert box */
+@keyframes alertglow{
+  0%,100%{box-shadow:0 0 0 1px rgba(224,90,58,0.3)}
+  50%{box-shadow:0 0 12px rgba(224,90,58,0.4),0 0 0 1px rgba(224,90,58,0.5)}
+}
+.alert-sim{animation:alertglow 2.5s ease-in-out infinite}
+
+/* Sticky nav */
+.sticky-nav{
+  position:sticky;top:0;z-index:50;
+  backdrop-filter:blur(14px);
+  background:rgba(11,14,8,0.88);
+  border-bottom:1px solid var(--border);
+}
+
+/* Table */
+.dt{width:100%;border-collapse:collapse;font-family:'Source Code Pro',monospace;font-size:.72rem}
+.dt th{text-align:left;padding:8px 12px;color:var(--muted);border-bottom:1px solid var(--border)}
+.dt td{padding:7px 12px;border-bottom:1px solid rgba(42,51,34,.5);color:var(--text)}
+.dt tr:hover td{background:rgba(126,200,80,.03)}
+
+/* Progress */
+.pbar{height:3px;border-radius:2px;background:var(--border)}
+.pfill{height:3px;border-radius:2px;background:linear-gradient(90deg,var(--accent),var(--gold))}
+
+/* Onion layer diagram label */
+.ol{font-family:'Oxanium',sans-serif;font-size:.7rem;font-weight:600}
+
+/* Scrollbar */
+::-webkit-scrollbar{width:6px;height:6px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:var(--dim);border-radius:3px}
+</style>
+</head>
+<body>
+
+<!-- ── STICKY NAV ─────────────────────────────────────── -->
+<nav class="sticky-nav px-5 py-3">
+  <div class="max-w-7xl mx-auto flex items-center justify-between">
+    <div class="flex items-center gap-3">
+      <!-- Onion SVG icon -->
+      <svg width="30" height="30" viewBox="0 0 30 30" fill="none">
+        <circle cx="15" cy="15" r="12" stroke="#7ec850" stroke-width="1.2" opacity=".3"/>
+        <circle cx="15" cy="15" r="8.5" stroke="#7ec850" stroke-width="1.2" opacity=".55"/>
+        <circle cx="15" cy="15" r="5" stroke="#7ec850" stroke-width="1.5"/>
+        <circle cx="15" cy="15" r="2" fill="#7ec850"/>
+        <path d="M15 3 Q18 8 15 12 Q12 8 15 3Z" fill="#7ec850" opacity=".6"/>
+      </svg>
+      <span style="font-family:'Oxanium',sans-serif;font-weight:800;font-size:1rem;color:#fff">SECURITY<span style="color:var(--accent)">ONION</span></span>
+    </div>
+    <div class="hidden md:flex items-center gap-4 text-xs mono" style="color:var(--muted)">
+      <a href="#p1" class="hover:text-white transition-colors">FUNDAMENTALS</a>
+      <a href="#p2" class="hover:text-white transition-colors">INSTALL</a>
+      <a href="#p3" class="hover:text-white transition-colors">CONFIG</a>
+      <a href="#p4" class="hover:text-white transition-colors">INGEST</a>
+      <a href="#p5" class="hover:text-white transition-colors">LOGS</a>
+      <a href="#p6" class="hover:text-white transition-colors">DETECT</a>
+      <a href="#p7" class="hover:text-white transition-colors">TUNE</a>
+      <a href="#p8" class="hover:text-white transition-colors">HUNT</a>
+      <a href="#p9" class="hover:text-white transition-colors">IR</a>
+      <a href="#p10" class="hover:text-white transition-colors">ADVANCED</a>
+      <a href="#p11" class="hover:text-white transition-colors">LABS</a>
+    </div>
+    <span class="cpill" style="border-color:rgba(126,200,80,.35);color:var(--accent)">
+      <span class="w-1.5 h-1.5 rounded-full bg-green-400 inline-block ring"></span>
+      SO 2.4 TRAINING
+    </span>
+  </div>
+</nav>
+
+<div class="relative z-10 max-w-7xl mx-auto px-4 md:px-8 py-12">
+
+<!-- ── HERO ───────────────────────────────────────────── -->
+<header class="mb-20">
+  <div class="absolute right-0 top-20 w-96 h-96 rounded-full pointer-events-none" style="background:radial-gradient(circle,rgba(126,200,80,0.07),transparent 70%);filter:blur(60px)"></div>
+
+  <p class="snum mb-5">// SENIOR SOC ANALYST MENTORSHIP — SECURITY ONION MASTERY</p>
+  <h1 class="hero-title mb-5">
+    <span style="color:#fff">Security</span>
+    <span class="glow-g" style="color:var(--accent)"> Onion</span><br/>
+    <span style="color:var(--gold)" class="glow-a">Complete SOC</span><br/>
+    <span style="color:#fff">Training Program</span>
+  </h1>
+  <p class="max-w-2xl mb-10" style="color:var(--muted);font-size:.95rem;line-height:1.8;font-style:italic">
+    From installation to advanced threat hunting — a strict, hands-on mentorship covering every component of the Security Onion platform. Eleven phases. Zero shortcuts.
+  </p>
+
+  <!-- Stats -->
+  <div class="grid grid-cols-2 md:grid-cols-5 gap-3 mb-10">
+    <div class="card p-4 text-center">
+      <div style="font-family:'Oxanium',sans-serif;font-size:2rem;font-weight:800;color:var(--accent)">11</div>
+      <div class="text-xs mono mt-1" style="color:var(--muted)">PHASES</div>
+    </div>
+    <div class="card p-4 text-center">
+      <div style="font-family:'Oxanium',sans-serif;font-size:2rem;font-weight:800;color:var(--gold)">5+</div>
+      <div class="text-xs mono mt-1" style="color:var(--muted)">CORE TOOLS</div>
+    </div>
+    <div class="card p-4 text-center">
+      <div style="font-family:'Oxanium',sans-serif;font-size:2rem;font-weight:800;color:var(--teal)">SO</div>
+      <div class="text-xs mono mt-1" style="color:var(--muted)">2.4 / 2.5</div>
+    </div>
+    <div class="card p-4 text-center">
+      <div style="font-family:'Oxanium',sans-serif;font-size:2rem;font-weight:800;color:var(--red)">100%</div>
+      <div class="text-xs mono mt-1" style="color:var(--muted)">HANDS-ON</div>
+    </div>
+    <div class="card p-4 text-center">
+      <div style="font-family:'Oxanium',sans-serif;font-size:2rem;font-weight:800;color:var(--purple)">NSM</div>
+      <div class="text-xs mono mt-1" style="color:var(--muted)">FULL STACK</div>
+    </div>
+  </div>
+
+  <!-- Component pills -->
+  <div class="flex flex-wrap gap-2">
+    <span class="cpill" style="border-color:rgba(126,200,80,.3);color:var(--accent)">Suricata IDS</span>
+    <span class="cpill" style="border-color:rgba(78,205,196,.3);color:var(--teal)">Zeek NSM</span>
+    <span class="cpill" style="border-color:rgba(90,179,212,.3);color:var(--blue)">Elasticsearch</span>
+    <span class="cpill" style="border-color:rgba(155,114,207,.3);color:var(--purple)">Kibana</span>
+    <span class="cpill" style="border-color:rgba(212,168,67,.3);color:var(--gold)">Logstash</span>
+    <span class="cpill" style="border-color:rgba(224,90,58,.3);color:var(--red)">TheHive</span>
+    <span class="cpill" style="border-color:rgba(126,200,80,.3);color:var(--accent)">Strelka</span>
+    <span class="cpill" style="border-color:rgba(78,205,196,.3);color:var(--teal)">Stenographer</span>
+    <span class="cpill" style="border-color:rgba(212,168,67,.3);color:var(--gold)">FleetDM</span>
+  </div>
+</header>
+
+<!-- ═══════════════════════════════════════════════
+     PHASE 1 — FUNDAMENTALS
+═══════════════════════════════════════════════ -->
+<section id="p1" class="mb-20">
+  <div class="flex items-center gap-4 mb-8">
+    <div class="w-12 h-12 rounded-xl flex items-center justify-center shrink-0" style="background:rgba(126,200,80,.1);border:1px solid rgba(126,200,80,.3)">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#7ec850" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
+    </div>
+    <div>
+      <span class="pbadge" style="background:rgba(126,200,80,.1);color:var(--accent);border:1px solid rgba(126,200,80,.25)">PHASE 01</span>
+      <h2 class="text-2xl font-bold mt-1">Fundamentals & Architecture</h2>
+    </div>
+  </div>
+
+  <!-- What is Security Onion -->
+  <div class="card p-6 mb-6">
+    <h3 class="text-base font-bold mb-3" style="color:var(--accent)">What is Security Onion?</h3>
+    <p class="text-sm mb-4" style="color:var(--muted)">Security Onion is a free, open-source Linux distribution purpose-built for <strong style="color:var(--text)">threat hunting, network security monitoring (NSM), and log management</strong>. It bundles enterprise-grade tools into a single deployable platform — a complete SOC-in-a-box.</p>
+    <div class="grid md:grid-cols-3 gap-4">
+      <div class="rounded-lg p-4" style="background:rgba(126,200,80,.05);border:1px solid rgba(126,200,80,.15)">
+        <p class="text-xs font-bold mb-1" style="color:var(--accent);font-family:'Oxanium',sans-serif">DETECTION</p>
+        <p class="text-xs" style="color:var(--muted)">Suricata fires signature-based alerts. Zeek generates rich protocol logs. Together they cover network visibility end-to-end.</p>
+      </div>
+      <div class="rounded-lg p-4" style="background:rgba(212,168,67,.05);border:1px solid rgba(212,168,67,.15)">
+        <p class="text-xs font-bold mb-1" style="color:var(--gold);font-family:'Oxanium',sans-serif">STORAGE & SEARCH</p>
+        <p class="text-xs" style="color:var(--muted)">Elasticsearch stores all logs. Logstash parses and enriches. Kibana visualizes. Every packet metadata is searchable in seconds.</p>
+      </div>
+      <div class="rounded-lg p-4" style="background:rgba(224,90,58,.05);border:1px solid rgba(224,90,58,.15)">
+        <p class="text-xs font-bold mb-1" style="color:var(--red);font-family:'Oxanium',sans-serif">RESPONSE</p>
+        <p class="text-xs" style="color:var(--muted)">TheHive provides case management. Stenographer captures full PCAP. Analysts pivot from alert → evidence → conclusion in one platform.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Architecture diagram -->
+  <div class="card p-6 mb-6">
+    <p class="snum mb-4">// SECURITY ONION — LAYERED ARCHITECTURE</p>
+    <div class="overflow-x-auto">
+      <svg viewBox="0 0 720 310" xmlns="http://www.w3.org/2000/svg" style="width:100%;min-width:540px">
+        <defs>
+          <marker id="a1" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
+            <path d="M0,0 L0,6 L6,3z" fill="#2a3322"/>
+          </marker>
+          <marker id="a2" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
+            <path d="M0,0 L0,6 L6,3z" fill="#7ec850" opacity=".7"/>
+          </marker>
+        </defs>
+
+        <!-- Layer 0: Network -->
+        <rect x="10" y="10" width="700" height="40" rx="6" fill="#0d1109" stroke="#2a3322" stroke-width="1"/>
+        <text x="360" y="35" text-anchor="middle" fill="#3d4f35" font-size="11" font-family="Oxanium" font-weight="700" letter-spacing="3">NETWORK TRAFFIC — SPAN PORT / TAP</text>
+
+        <!-- Arrow down -->
+        <path d="M360,50 L360,70" stroke="#2a3322" stroke-width="1.5" marker-end="url(#a1)"/>
+
+        <!-- Layer 1: Capture -->
+        <rect x="10" y="72" width="700" height="48" rx="6" fill="#0f1a0a" stroke="rgba(126,200,80,.25)" stroke-width="1.2"/>
+        <text x="30" y="95" fill="#7ec850" font-size="10" font-family="Oxanium" font-weight="600">CAPTURE LAYER</text>
+        <rect x="150" y="80" width="100" height="30" rx="5" fill="#0b0e08" stroke="rgba(78,205,196,.35)" stroke-width="1"/>
+        <text x="200" y="99" text-anchor="middle" fill="#4ecdc4" font-size="9" font-family="Source Code Pro">Stenographer</text>
+        <rect x="270" y="80" width="100" height="30" rx="5" fill="#0b0e08" stroke="rgba(126,200,80,.35)" stroke-width="1"/>
+        <text x="320" y="99" text-anchor="middle" fill="#7ec850" font-size="9" font-family="Source Code Pro">AF_PACKET</text>
+        <rect x="390" y="80" width="100" height="30" rx="5" fill="#0b0e08" stroke="rgba(212,168,67,.35)" stroke-width="1"/>
+        <text x="440" y="99" text-anchor="middle" fill="#d4a843" font-size="9" font-family="Source Code Pro">PCAP Replay</text>
+
+        <path d="M360,120 L360,140" stroke="#2a3322" stroke-width="1.5" marker-end="url(#a1)"/>
+
+        <!-- Layer 2: Analysis -->
+        <rect x="10" y="142" width="700" height="48" rx="6" fill="#0f1a0a" stroke="rgba(78,205,196,.25)" stroke-width="1.2"/>
+        <text x="30" y="165" fill="#4ecdc4" font-size="10" font-family="Oxanium" font-weight="600">ANALYSIS LAYER</text>
+        <rect x="140" y="150" width="90" height="30" rx="5" fill="#0b0e08" stroke="rgba(126,200,80,.4)" stroke-width="1.2"/>
+        <text x="185" y="169" text-anchor="middle" fill="#7ec850" font-size="9" font-family="Source Code Pro">Suricata</text>
+        <rect x="245" y="150" width="90" height="30" rx="5" fill="#0b0e08" stroke="rgba(78,205,196,.4)" stroke-width="1.2"/>
+        <text x="290" y="169" text-anchor="middle" fill="#4ecdc4" font-size="9" font-family="Source Code Pro">Zeek</text>
+        <rect x="350" y="150" width="90" height="30" rx="5" fill="#0b0e08" stroke="rgba(212,168,67,.4)" stroke-width="1.2"/>
+        <text x="395" y="169" text-anchor="middle" fill="#d4a843" font-size="9" font-family="Source Code Pro">Strelka</text>
+        <rect x="455" y="150" width="100" height="30" rx="5" fill="#0b0e08" stroke="rgba(224,90,58,.35)" stroke-width="1"/>
+        <text x="505" y="169" text-anchor="middle" fill="#e05a3a" font-size="9" font-family="Source Code Pro">osquery/Fleet</text>
+
+        <path d="M360,190 L360,210" stroke="#2a3322" stroke-width="1.5" marker-end="url(#a1)"/>
+
+        <!-- Layer 3: Storage -->
+        <rect x="10" y="212" width="700" height="48" rx="6" fill="#0f1a0a" stroke="rgba(90,179,212,.25)" stroke-width="1.2"/>
+        <text x="30" y="235" fill="#5ab3d4" font-size="10" font-family="Oxanium" font-weight="600">STORAGE LAYER</text>
+        <rect x="150" y="220" width="140" height="30" rx="5" fill="#0b0e08" stroke="rgba(90,179,212,.4)" stroke-width="1.2"/>
+        <text x="220" y="239" text-anchor="middle" fill="#5ab3d4" font-size="9" font-family="Source Code Pro">Elasticsearch</text>
+        <rect x="305" y="220" width="120" height="30" rx="5" fill="#0b0e08" stroke="rgba(212,168,67,.35)" stroke-width="1"/>
+        <text x="365" y="239" text-anchor="middle" fill="#d4a843" font-size="9" font-family="Source Code Pro">Logstash</text>
+        <rect x="440" y="220" width="80" height="30" rx="5" fill="#0b0e08" stroke="rgba(155,114,207,.35)" stroke-width="1"/>
+        <text x="480" y="239" text-anchor="middle" fill="#9b72cf" font-size="9" font-family="Source Code Pro">Redis</text>
+
+        <path d="M360,260 L360,278" stroke="#2a3322" stroke-width="1.5" marker-end="url(#a1)"/>
+
+        <!-- Layer 4: UI -->
+        <rect x="10" y="280" width="700" height="25" rx="6" fill="#0f1a0a" stroke="rgba(155,114,207,.3)" stroke-width="1.2"/>
+        <text x="200" y="297" text-anchor="middle" fill="#9b72cf" font-size="9" font-family="Source Code Pro">Kibana</text>
+        <text x="330" y="297" text-anchor="middle" fill="#e05a3a" font-size="9" font-family="Source Code Pro">TheHive</text>
+        <text x="450" y="297" text-anchor="middle" fill="#d4a843" font-size="9" font-family="Source Code Pro">Security Onion Console (SOC)</text>
+        <text x="30" y="297" fill="#9b72cf" font-size="10" font-family="Oxanium" font-weight="600">UI / SOC LAYER</text>
+      </svg>
+    </div>
+  </div>
+
+  <!-- Data flow -->
+  <div class="card p-6">
+    <p class="snum mb-4">// HOW DATA FLOWS INSIDE SECURITY ONION</p>
+    <div class="overflow-x-auto">
+      <svg viewBox="0 0 700 60" xmlns="http://www.w3.org/2000/svg" style="width:100%;min-width:500px">
+        <defs>
+          <marker id="a3" markerWidth="6" markerHeight="6" refX="5" refY="3" orient="auto">
+            <path d="M0,0 L0,6 L6,3z" fill="#7ec850" opacity=".8"/>
+          </marker>
+        </defs>
+        <rect x="5" y="12" width="75" height="36" rx="6" fill="#0d1109" stroke="rgba(126,200,80,.3)" stroke-width="1.2"/>
+        <text x="42" y="29" text-anchor="middle" fill="#7ec850" font-size="9" font-family="Source Code Pro">Network</text>
+        <text x="42" y="42" text-anchor="middle" fill="#3d4f35" font-size="7.5" font-family="Source Code Pro">packets</text>
+        <path d="M80,30 L105,30" stroke="#7ec850" stroke-width="1" marker-end="url(#a3)" opacity=".7"/>
+        <rect x="108" y="12" width="75" height="36" rx="6" fill="#0d1109" stroke="rgba(78,205,196,.3)" stroke-width="1.2"/>
+        <text x="145" y="29" text-anchor="middle" fill="#4ecdc4" font-size="9" font-family="Source Code Pro">Zeek/</text>
+        <text x="145" y="42" text-anchor="middle" fill="#4ecdc4" font-size="9" font-family="Source Code Pro">Suricata</text>
+        <path d="M183,30 L208,30" stroke="#7ec850" stroke-width="1" marker-end="url(#a3)" opacity=".7"/>
+        <rect x="210" y="12" width="75" height="36" rx="6" fill="#0d1109" stroke="rgba(212,168,67,.3)" stroke-width="1.2"/>
+        <text x="247" y="29" text-anchor="middle" fill="#d4a843" font-size="9" font-family="Source Code Pro">Logstash</text>
+        <text x="247" y="42" text-anchor="middle" fill="#3d4f35" font-size="7.5" font-family="Source Code Pro">parse/enrich</text>
+        <path d="M285,30 L310,30" stroke="#7ec850" stroke-width="1" marker-end="url(#a3)" opacity=".7"/>
+        <rect x="312" y="12" width="75" height="36" rx="6" fill="#0d1109" stroke="rgba(90,179,212,.3)" stroke-width="1.2"/>
+        <text x="349" y="29" text-anchor="middle" fill="#5ab3d4" font-size="9" font-family="Source Code Pro">Elastic</text>
+        <text x="349" y="42" text-anchor="middle" fill="#3d4f35" font-size="7.5" font-family="Source Code Pro">index+store</text>
+        <path d="M387,30 L412,30" stroke="#7ec850" stroke-width="1" marker-end="url(#a3)" opacity=".7"/>
+        <rect x="414" y="12" width="75" height="36" rx="6" fill="#0d1109" stroke="rgba(155,114,207,.3)" stroke-width="1.2"/>
+        <text x="451" y="29" text-anchor="middle" fill="#9b72cf" font-size="9" font-family="Source Code Pro">Kibana</text>
+        <text x="451" y="42" text-anchor="middle" fill="#3d4f35" font-size="7.5" font-family="Source Code Pro">visualize</text>
+        <path d="M489,30 L514,30" stroke="#7ec850" stroke-width="1" marker-end="url(#a3)" opacity=".7"/>
+        <rect x="516" y="12" width="80" height="36" rx="6" fill="#0d1109" stroke="rgba(224,90,58,.3)" stroke-width="1.2"/>
+        <text x="556" y="29" text-anchor="middle" fill="#e05a3a" font-size="9" font-family="Source Code Pro">SOC Alert</text>
+        <text x="556" y="42" text-anchor="middle" fill="#3d4f35" font-size="7.5" font-family="Source Code Pro">triage</text>
+        <path d="M596,30 L621,30" stroke="#7ec850" stroke-width="1" marker-end="url(#a3)" opacity=".7"/>
+        <rect x="623" y="12" width="72" height="36" rx="6" fill="#0d1109" stroke="rgba(126,200,80,.4)" stroke-width="1.5"/>
+        <text x="659" y="29" text-anchor="middle" fill="#7ec850" font-size="9" font-family="Source Code Pro">Analyst</text>
+        <text x="659" y="42" text-anchor="middle" fill="#7ec850" font-size="7.5" font-family="Source Code Pro">hunts</text>
+      </svg>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════
+     PHASE 2 — INSTALLATION
+═══════════════════════════════════════════════ -->
+<section id="p2" class="mb-20">
+  <div class="flex items-center gap-4 mb-8">
+    <div class="w-12 h-12 rounded-xl flex items-center justify-center shrink-0" style="background:rgba(212,168,67,.1);border:1px solid rgba(212,168,67,.3)">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#d4a843" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><path d="M8 21h8m-4-4v4"/></svg>
+    </div>
+    <div>
+      <span class="pbadge" style="background:rgba(212,168,67,.1);color:var(--gold);border:1px solid rgba(212,168,67,.25)">PHASE 02</span>
+      <h2 class="text-2xl font-bold mt-1">Lab Setup & Installation</h2>
+    </div>
+  </div>
+
+  <!-- Hardware requirements -->
+  <div class="card p-6 mb-6">
+    <p class="snum mb-4">// VM HARDWARE REQUIREMENTS</p>
+    <div class="overflow-x-auto">
+      <table class="dt">
+        <thead><tr>
+          <th>Component</th><th>Minimum</th><th>Recommended (Lab)</th><th>Production</th>
+        </tr></thead>
+        <tbody>
+          <tr><td style="color:var(--accent)">RAM</td><td>8 GB</td><td style="color:var(--gold)">16 GB</td><td>32–64 GB</td></tr>
+          <tr><td style="color:var(--accent)">CPU</td><td>4 cores</td><td style="color:var(--gold)">8 cores</td><td>16+ cores</td></tr>
+          <tr><td style="color:var(--accent)">Disk</td><td>100 GB</td><td style="color:var(--gold)">200 GB SSD</td><td>1 TB+ NVMe</td></tr>
+          <tr><td style="color:var(--accent)">NICs</td><td>1 (mgmt)</td><td style="color:var(--gold)">2 (mgmt + monitor)</td><td>3+ dedicated</td></tr>
+          <tr><td style="color:var(--accent)">Network</td><td>NAT</td><td style="color:var(--gold)">Bridged + Host-only</td><td>SPAN/TAP</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="grid md:grid-cols-2 gap-6 mb-6">
+    <!-- Download + Boot -->
+    <div class="card p-6">
+      <p class="snum mb-3">// STEP 1 — DOWNLOAD & BOOT</p>
+      <div class="cb amber text-xs">
+<span class="cm"># 1. Download Security Onion ISO</span><br/>
+<span class="g">https://github.com/Security-Onion-Solutions</span><br/>
+<span class="g">/securityonion/releases</span><br/><br/>
+<span class="cm"># 2. Verify SHA256</span><br/>
+<span class="pr">$</span> <span class="k">sha256sum</span> securityonion-2.4.iso<br/>
+<span class="cm"># Must match published hash!</span><br/><br/>
+<span class="cm"># 3. VMware/VirtualBox settings</span><br/>
+<span class="cm"># NIC 1: NAT (management access)</span><br/>
+<span class="cm"># NIC 2: Host-only (sniffing)</span><br/>
+<span class="cm"># Enable promiscuous on NIC 2</span>
+      </div>
+    </div>
+
+    <!-- Network config -->
+    <div class="card p-6">
+      <p class="snum mb-3">// NETWORK ADAPTER ROLES</p>
+      <div class="space-y-3">
+        <div class="rounded-lg p-3" style="background:rgba(126,200,80,.05);border:1px solid rgba(126,200,80,.15)">
+          <p class="text-xs font-bold" style="color:var(--accent);font-family:'Oxanium',sans-serif">ens32 — MANAGEMENT</p>
+          <p class="text-xs mt-1" style="color:var(--muted)">Has IP. Used for SSH, web UI access, updates. <strong style="color:var(--text)">NEVER monitor on this interface</strong> — it creates feedback loops.</p>
+        </div>
+        <div class="rounded-lg p-3" style="background:rgba(78,205,196,.05);border:1px solid rgba(78,205,196,.15)">
+          <p class="text-xs font-bold" style="color:var(--teal);font-family:'Oxanium',sans-serif">ens33 — MONITOR (sniffing)</p>
+          <p class="text-xs mt-1" style="color:var(--muted)">No IP assigned. Promiscuous mode on. Receives SPAN/mirrored traffic. Suricata + Zeek listen here.</p>
+        </div>
+        <div class="rounded-lg p-3" style="background:rgba(212,168,67,.05);border:1px solid rgba(212,168,67,.15)">
+          <p class="text-xs font-bold" style="color:var(--gold);font-family:'Oxanium',sans-serif">WHY: Separation of concerns</p>
+          <p class="text-xs mt-1" style="color:var(--muted)">Mixing management + monitor on same NIC causes your own queries to appear as suspicious traffic. Keep them separate always.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Installation walkthrough -->
+  <div class="card p-6">
+    <p class="snum mb-4">// INSTALLATION WALKTHROUGH — STANDALONE MODE</p>
+    <div class="grid md:grid-cols-3 gap-4 mb-4">
+      <div class="rounded-lg p-4" style="background:rgba(126,200,80,.04);border:1px solid rgba(126,200,80,.12)">
+        <p class="text-xs font-bold mb-2" style="color:var(--accent);font-family:'Oxanium',sans-serif">1 — BOOT & START</p>
+        <p class="text-xs" style="color:var(--muted)">Boot ISO. Select <em style="color:var(--text)">Install Security Onion</em>. Create admin user. Choose <em style="color:var(--text)">STANDALONE</em> deployment for single-node lab.</p>
+      </div>
+      <div class="rounded-lg p-4" style="background:rgba(212,168,67,.04);border:1px solid rgba(212,168,67,.12)">
+        <p class="text-xs font-bold mb-2" style="color:var(--gold);font-family:'Oxanium',sans-serif">2 — INTERFACE SELECT</p>
+        <p class="text-xs" style="color:var(--muted)">Assign management NIC (gets IP). Assign monitor NIC(s). Set HOME_NET — your internal subnet range (e.g. 192.168.1.0/24).</p>
+      </div>
+      <div class="rounded-lg p-4" style="background:rgba(90,179,212,.04);border:1px solid rgba(90,179,212,.12)">
+        <p class="text-xs font-bold mb-2" style="color:var(--blue);font-family:'Oxanium',sans-serif">3 — SERVICES START</p>
+        <p class="text-xs" style="color:var(--muted)">SO installs Elasticsearch, Logstash, Kibana, Suricata, Zeek, TheHive. Setup takes ~15–30 min. Do NOT reboot mid-setup.</p>
+      </div>
+    </div>
+    <div class="cb text-xs">
+<span class="cm"># After install — verify all services</span><br/>
+<span class="pr">$</span> <span class="k">sudo so-status</span><br/>
+<span class="cm"># All services should show: running (green)</span><br/><br/>
+<span class="pr">$</span> <span class="k">sudo so-restart</span>       <span class="cm"># restart all SO services</span><br/>
+<span class="pr">$</span> <span class="k">sudo so-elastic-status</span> <span class="cm"># check Elasticsearch health</span><br/>
+<span class="pr">$</span> <span class="k">sudo so-zeek-status</span>    <span class="cm"># check Zeek workers</span><br/>
+<span class="pr">$</span> <span class="k">sudo so-suricata-status</span><span class="cm"># check Suricata</span>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════
+     PHASE 3 — CONFIGURATION
+═══════════════════════════════════════════════ -->
+<section id="p3" class="mb-20">
+  <div class="flex items-center gap-4 mb-8">
+    <div class="w-12 h-12 rounded-xl flex items-center justify-center shrink-0" style="background:rgba(78,205,196,.1);border:1px solid rgba(78,205,196,.3)">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#4ecdc4" stroke-width="2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+    </div>
+    <div>
+      <span class="pbadge" style="background:rgba(78,205,196,.1);color:var(--teal);border:1px solid rgba(78,205,196,.25)">PHASE 03</span>
+      <h2 class="text-2xl font-bold mt-1">Initial Configuration & Web Interface</h2>
+    </div>
+  </div>
+
+  <div class="grid md:grid-cols-2 gap-6">
+    <div class="card p-6">
+      <p class="snum mb-3">// ACCESSING THE WEB UI</p>
+      <div class="cb teal text-xs">
+<span class="cm"># Access Security Onion Console (SOC)</span><br/>
+<span class="t">https://&lt;management-ip&gt;</span><br/>
+<span class="cm"># Login with admin user created during setup</span><br/><br/>
+<span class="cm"># Or via CLI: get IP first</span><br/>
+<span class="pr">$</span> ip addr show ens32<br/><br/>
+<span class="cm"># Add your analyst workstation IP</span><br/>
+<span class="cm"># to the access whitelist:</span><br/>
+<span class="pr">$</span> <span class="k">sudo so-allow</span><br/>
+<span class="cm"># Select option: analyst</span><br/>
+<span class="cm"># Enter your IP: 192.168.x.x</span>
+      </div>
+    </div>
+    <div class="card p-6">
+      <p class="snum mb-3">// SENSOR vs STANDALONE</p>
+      <div class="space-y-3 text-xs" style="color:var(--muted)">
+        <div class="rounded-lg p-3" style="background:rgba(126,200,80,.05);border:1px solid rgba(126,200,80,.15)">
+          <p class="font-bold mb-1" style="color:var(--accent);font-family:'Oxanium',sans-serif">STANDALONE (Lab use)</p>
+          <p>All components on one box. Management + Elasticsearch + Suricata + Zeek. Good for learning, small environments.</p>
+        </div>
+        <div class="rounded-lg p-3" style="background:rgba(90,179,212,.05);border:1px solid rgba(90,179,212,.15)">
+          <p class="font-bold mb-1" style="color:var(--blue);font-family:'Oxanium',sans-serif">DISTRIBUTED (Production)</p>
+          <p>Manager node runs Elasticsearch. Sensor nodes run Suricata+Zeek, forward logs. Scale independently per role.</p>
+        </div>
+        <div class="rounded-lg p-3" style="background:rgba(212,168,67,.05);border:1px solid rgba(212,168,67,.15)">
+          <p class="font-bold mb-1" style="color:var(--gold);font-family:'Oxanium',sans-serif">IMPORT (PCAP training)</p>
+          <p>Process PCAP files offline without live monitoring. Perfect for training and rule validation without a SPAN port.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════
+     PHASE 4 — TRAFFIC INGESTION
+═══════════════════════════════════════════════ -->
+<section id="p4" class="mb-20">
+  <div class="flex items-center gap-4 mb-8">
+    <div class="w-12 h-12 rounded-xl flex items-center justify-center shrink-0" style="background:rgba(90,179,212,.1);border:1px solid rgba(90,179,212,.3)">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#5ab3d4" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+    </div>
+    <div>
+      <span class="pbadge" style="background:rgba(90,179,212,.1);color:var(--blue);border:1px solid rgba(90,179,212,.25)">PHASE 04</span>
+      <h2 class="text-2xl font-bold mt-1">Traffic Ingestion</h2>
+    </div>
+  </div>
+
+  <div class="grid md:grid-cols-2 gap-6 mb-6">
+    <div class="card p-6">
+      <p class="snum mb-3">// LIVE TRAFFIC MONITORING</p>
+      <div class="cb blue text-xs">
+<span class="cm"># Verify Zeek is watching the monitor NIC</span><br/>
+<span class="pr">$</span> <span class="k">cat</span> /opt/so/conf/zeek/node.cfg<br/>
+<span class="cm"># Look for: interface=ens33</span><br/><br/>
+<span class="cm"># Check Suricata interface config</span><br/>
+<span class="pr">$</span> <span class="k">cat</span> /opt/so/conf/suricata/suricata.yaml<br/>
+<span class="cm"># af-packet: interface: ens33</span><br/><br/>
+<span class="cm"># Watch live Zeek logs</span><br/>
+<span class="pr">$</span> <span class="k">tail -f</span> /nsm/zeek/logs/current/conn.log<br/>
+<span class="pr">$</span> <span class="k">tail -f</span> /nsm/zeek/logs/current/dns.log<br/><br/>
+<span class="cm"># Watch Suricata alerts live</span><br/>
+<span class="pr">$</span> <span class="k">tail -f</span> /nsm/suricata/eve.json \<br/>
+&nbsp;&nbsp;| jq <span class="s">'select(.event_type=="alert")'</span>
+      </div>
+    </div>
+    <div class="card p-6">
+      <p class="snum mb-3">// PCAP REPLAY (OFFLINE ANALYSIS)</p>
+      <div class="cb text-xs">
+<span class="cm"># Method 1: so-import-pcap (recommended)</span><br/>
+<span class="pr">$</span> <span class="k">sudo so-import-pcap</span> /path/to/attack.pcap<br/>
+<span class="cm"># Automatically:</span><br/>
+<span class="cm"># - Runs through Suricata + Zeek</span><br/>
+<span class="cm"># - Ingests into Elasticsearch</span><br/>
+<span class="cm"># - Outputs timestamp range to search</span><br/><br/>
+<span class="cm"># Method 2: Manual tcpreplay</span><br/>
+<span class="pr">$</span> <span class="k">sudo tcpreplay</span> \<br/>
+&nbsp;&nbsp;--intf1=ens33 \<br/>
+&nbsp;&nbsp;--multiplier=1.0 \<br/>
+&nbsp;&nbsp;attack.pcap<br/><br/>
+<span class="cm"># Method 3: Zeek standalone</span><br/>
+<span class="pr">$</span> <span class="k">zeek</span> -r attack.pcap local.zeek
+      </div>
+    </div>
+  </div>
+
+  <!-- Log locations -->
+  <div class="card p-6">
+    <p class="snum mb-4">// LOG LOCATIONS REFERENCE</p>
+    <div class="overflow-x-auto">
+      <table class="dt">
+        <thead><tr><th>Source</th><th>Log Path</th><th>Format</th><th>Key Fields</th></tr></thead>
+        <tbody>
+          <tr><td style="color:var(--accent)">Suricata alerts</td><td><span class="mono text-xs">/nsm/suricata/eve.json</span></td><td>JSON</td><td>event_type, alert.signature, src_ip</td></tr>
+          <tr><td style="color:var(--teal)">Zeek conn</td><td><span class="mono text-xs">/nsm/zeek/logs/current/conn.log</span></td><td>TSV/JSON</td><td>id.orig_h, id.resp_h, proto, service</td></tr>
+          <tr><td style="color:var(--teal)">Zeek DNS</td><td><span class="mono text-xs">/nsm/zeek/logs/current/dns.log</span></td><td>TSV/JSON</td><td>query, qtype_name, answers</td></tr>
+          <tr><td style="color:var(--teal)">Zeek HTTP</td><td><span class="mono text-xs">/nsm/zeek/logs/current/http.log</span></td><td>TSV/JSON</td><td>host, uri, method, status_code</td></tr>
+          <tr><td style="color:var(--teal)">Zeek SSL</td><td><span class="mono text-xs">/nsm/zeek/logs/current/ssl.log</span></td><td>TSV/JSON</td><td>server_name, version, cipher</td></tr>
+          <tr><td style="color:var(--gold)">PCAP (full)</td><td><span class="mono text-xs">/nsm/stenographer/</span></td><td>PCAP</td><td>Full packet capture, queryable</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════
+     PHASE 5 — LOG ANALYSIS & ALERTS
+═══════════════════════════════════════════════ -->
+<section id="p5" class="mb-20">
+  <div class="flex items-center gap-4 mb-8">
+    <div class="w-12 h-12 rounded-xl flex items-center justify-center shrink-0" style="background:rgba(155,114,207,.1);border:1px solid rgba(155,114,207,.3)">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#9b72cf" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M3 15h18M9 3v18"/></svg>
+    </div>
+    <div>
+      <span class="pbadge" style="background:rgba(155,114,207,.1);color:var(--purple);border:1px solid rgba(155,114,207,.25)">PHASE 05</span>
+      <h2 class="text-2xl font-bold mt-1">Log Analysis & Alert Investigation</h2>
+    </div>
+  </div>
+
+  <div class="grid md:grid-cols-2 gap-6 mb-6">
+    <div class="card p-6">
+      <p class="snum mb-3">// KIBANA — SEARCHING ALERTS</p>
+      <div class="cb purple text-xs">
+<span class="cm"># Navigate: Kibana → Discover</span><br/>
+<span class="cm"># Index pattern: *:logstash-*</span><br/><br/>
+<span class="cm"># KQL: All IDS alerts</span><br/>
+<span class="p">event_type: "alert"</span><br/><br/>
+<span class="cm"># Filter by severity (1=high)</span><br/>
+<span class="p">alert.severity: 1</span><br/><br/>
+<span class="cm"># Pivot on attacker IP</span><br/>
+<span class="p">src_ip: "10.0.0.50" AND event_type: "alert"</span><br/><br/>
+<span class="cm"># DNS queries containing suspicious strings</span><br/>
+<span class="p">event_type: "dns" AND dns.query: *base64*</span><br/><br/>
+<span class="cm"># Correlate: same src, different event types</span><br/>
+<span class="p">source_ip: "10.0.0.50"</span>
+      </div>
+    </div>
+    <div class="card p-6">
+      <p class="snum mb-3">// ZEEK LOG FIELD ANATOMY</p>
+      <div class="cb teal text-xs">
+<span class="cm"># conn.log — every connection</span><br/>
+<span class="t">ts</span>        <span class="cm"># timestamp</span><br/>
+<span class="t">uid</span>       <span class="cm"># unique conn ID (pivot key!)</span><br/>
+<span class="t">id.orig_h</span> <span class="cm"># source IP</span><br/>
+<span class="t">id.resp_h</span> <span class="cm"># destination IP</span><br/>
+<span class="t">id.resp_p</span> <span class="cm"># destination port</span><br/>
+<span class="t">proto</span>     <span class="cm"># tcp/udp/icmp</span><br/>
+<span class="t">service</span>   <span class="cm"># detected application layer</span><br/>
+<span class="t">duration</span>  <span class="cm"># connection duration</span><br/>
+<span class="t">orig_bytes</span><span class="cm"># bytes from client</span><br/>
+<span class="t">resp_bytes</span><span class="cm"># bytes from server</span><br/>
+<span class="t">conn_state</span><span class="cm"># SF=normal, S0=no reply, REJ=reject</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Event correlation -->
+  <div class="card p-6">
+    <p class="snum mb-4">// CORRELATING EVENTS — THE UID PIVOT</p>
+    <p class="text-sm mb-4" style="color:var(--muted)">The <strong style="color:var(--teal)">uid</strong> field in Zeek logs is the master correlation key. A Suricata alert, a conn.log entry, an HTTP request, and an SSL log for the <em>same connection</em> all share the same <strong style="color:var(--accent)">uid</strong>.</p>
+    <div class="cb text-xs">
+<span class="cm"># Step 1: Find alert with uid</span><br/>
+<span class="pr">$</span> cat /nsm/suricata/eve.json | jq -r <span class="s">'.zeek_uid'</span> | head -5<br/>
+<span class="cm"># Returns: CmAk7a3sQdEj1xyz</span><br/><br/>
+<span class="cm"># Step 2: Pivot that uid across ALL Zeek logs</span><br/>
+<span class="pr">$</span> grep <span class="s">"CmAk7a3sQdEj1xyz"</span> /nsm/zeek/logs/current/*.log<br/>
+<span class="cm"># Instantly see: DNS query → TCP conn → HTTP request for same session</span><br/><br/>
+<span class="cm"># In Kibana:</span><br/>
+<span class="p">zeek_uid: "CmAk7a3sQdEj1xyz"</span><br/>
+<span class="cm"># Reveals full session context across all log types</span>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════
+     PHASE 6 — DETECTION ENGINEERING
+═══════════════════════════════════════════════ -->
+<section id="p6" class="mb-20">
+  <div class="flex items-center gap-4 mb-8">
+    <div class="w-12 h-12 rounded-xl flex items-center justify-center shrink-0" style="background:rgba(126,200,80,.1);border:1px solid rgba(126,200,80,.3)">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#7ec850" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+    </div>
+    <div>
+      <span class="pbadge" style="background:rgba(126,200,80,.1);color:var(--accent);border:1px solid rgba(126,200,80,.25)">PHASE 06</span>
+      <h2 class="text-2xl font-bold mt-1">Detection Engineering in Security Onion</h2>
+    </div>
+  </div>
+
+  <!-- Rule management -->
+  <div class="card p-6 mb-6">
+    <p class="snum mb-4">// SURICATA RULE MANAGEMENT IN SO</p>
+    <div class="grid md:grid-cols-2 gap-5">
+      <div>
+        <p class="text-xs font-bold mb-2" style="color:var(--accent);font-family:'Oxanium',sans-serif">RULE DIRECTORIES</p>
+        <div class="cb text-xs">
+<span class="cm"># Shipped rulesets (managed)</span><br/>
+<span class="k">/opt/so/rules/suricata/</span><br/><br/>
+<span class="cm"># YOUR custom rules go here</span><br/>
+<span class="k">/opt/so/saltstack/local/</span><br/>
+<span class="k">salt/suricata/rules/</span><br/>
+<span class="cm"># File: local.rules</span><br/><br/>
+<span class="cm"># Reload rules (NEVER edit in /opt/so directly)</span><br/>
+<span class="pr">$</span> <span class="k">sudo so-suricata-reload</span>
+        </div>
+      </div>
+      <div>
+        <p class="text-xs font-bold mb-2" style="color:var(--accent);font-family:'Oxanium',sans-serif">EXAMPLE CUSTOM RULES</p>
+        <div class="cb text-xs">
+<span class="cm"># Detect DNS tunnel (long subdomain)</span><br/>
+<span class="r">alert</span> <span class="g">dns</span> any any <span class="k">-></span> any any (<br/>
+&nbsp;&nbsp;<span class="t">msg:</span><span class="s">"SO-DNS Tunnel Query"</span>;<br/>
+&nbsp;&nbsp;<span class="t">dns.query;</span><br/>
+&nbsp;&nbsp;<span class="t">pcre:</span><span class="s">"/[a-z0-9]{40,}\./i"</span>;<br/>
+&nbsp;&nbsp;<span class="t">threshold:</span><span class="g">type both,</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="g">track by_src,</span><br/>
+&nbsp;&nbsp;&nbsp;&nbsp;<span class="g">count 5, seconds 60</span>;<br/>
+&nbsp;&nbsp;<span class="t">classtype:</span>trojan-activity;<br/>
+&nbsp;&nbsp;<span class="t">sid:</span><span class="g">9100001</span>;<span class="t">rev:</span><span class="g">1</span>;)
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Zeek scripting -->
+  <div class="card p-6">
+    <p class="snum mb-4">// CUSTOM ZEEK SCRIPT — PORT SCAN DETECTION</p>
+    <div class="grid md:grid-cols-2 gap-5">
+      <div class="cb teal text-xs">
+<span class="cm"># /opt/so/saltstack/local/salt/zeek/</span><br/>
+<span class="cm"># custom_scripts/portscan.zeek</span><br/><br/>
+<span class="t">module</span> PortScan;<br/><br/>
+<span class="t">export</span> {<br/>
+&nbsp;&nbsp;<span class="t">redef enum</span> Notice::Type += {<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;Scan<br/>
+&nbsp;&nbsp;};<br/>
+}<br/><br/>
+<span class="t">global</span> scan_table: <span class="t">table</span>[addr]<br/>
+&nbsp;&nbsp;<span class="t">of</span> <span class="t">set</span>[port] &default=set();<br/><br/>
+<span class="t">event</span> connection_attempt(c: connection) {<br/>
+&nbsp;&nbsp;add scan_table[c$id$orig_h][c$id$resp_p];<br/>
+&nbsp;&nbsp;<span class="t">if</span> (|scan_table[c$id$orig_h]| > 50)<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;NOTICE([$note=Scan,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;$msg=<span class="s">"Port scan detected"</span>,<br/>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;$src=c$id$orig_h]);<br/>
+}
+      </div>
+      <div>
+        <p class="text-xs font-bold mb-2" style="color:var(--teal);font-family:'Oxanium',sans-serif">DEPLOY ZEEK SCRIPT</p>
+        <div class="cb teal text-xs">
+<span class="cm"># Apply via salt</span><br/>
+<span class="pr">$</span> <span class="k">sudo salt</span> '*' state.apply zeek<br/><br/>
+<span class="cm"># Restart Zeek to load script</span><br/>
+<span class="pr">$</span> <span class="k">sudo so-zeek-restart</span><br/><br/>
+<span class="cm"># Test with PCAP replay</span><br/>
+<span class="pr">$</span> <span class="k">sudo so-import-pcap</span> nmap_scan.pcap<br/><br/>
+<span class="cm"># Check NOTICE log</span><br/>
+<span class="pr">$</span> <span class="k">cat</span> /nsm/zeek/logs/current/notice.log<br/>
+<span class="cm"># Should see: PortScan::Scan notice</span>
+        </div>
+        <div class="mt-4 rounded-lg p-3" style="background:rgba(212,168,67,.06);border:1px solid rgba(212,168,67,.15)">
+          <p class="text-xs font-bold mb-1" style="color:var(--gold);font-family:'Oxanium',sans-serif">WHY SALT?</p>
+          <p class="text-xs" style="color:var(--muted)">Security Onion uses SaltStack to manage configs across all nodes. Changes made through Salt propagate to all sensors automatically — this is how production SOCs push rule updates.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════
+     PHASE 7 — TUNING
+═══════════════════════════════════════════════ -->
+<section id="p7" class="mb-20">
+  <div class="flex items-center gap-4 mb-8">
+    <div class="w-12 h-12 rounded-xl flex items-center justify-center shrink-0" style="background:rgba(224,90,58,.1);border:1px solid rgba(224,90,58,.3)">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#e05a3a" stroke-width="2"><path d="M12 20V10"/><path d="M18 20V4"/><path d="M6 20v-4"/></svg>
+    </div>
+    <div>
+      <span class="pbadge" style="background:rgba(224,90,58,.1);color:var(--red);border:1px solid rgba(224,90,58,.25)">PHASE 07</span>
+      <h2 class="text-2xl font-bold mt-1">Alert Validation & Rule Tuning</h2>
+    </div>
+  </div>
+
+  <div class="grid md:grid-cols-2 gap-6">
+    <div class="card p-6">
+      <p class="snum mb-3">// SUPPRESS NOISY RULES</p>
+      <div class="cb red text-xs">
+<span class="cm"># Add to threshold.conf in Salt</span><br/>
+<span class="cm"># /opt/so/saltstack/local/salt/suricata/</span><br/>
+<span class="cm"># threshold.conf</span><br/><br/>
+<span class="cm"># Suppress specific SID from internal scanner</span><br/>
+<span class="r">suppress</span> gen_id 1, sig_id 9100001,<br/>
+&nbsp;&nbsp;track by_src,<br/>
+&nbsp;&nbsp;ip 192.168.1.50/32<br/><br/>
+<span class="cm"># Rate-limit noisy rule globally</span><br/>
+<span class="r">threshold</span> gen_id 1, sig_id 2019935,<br/>
+&nbsp;&nbsp;type limit, track by_src,<br/>
+&nbsp;&nbsp;count 1, seconds 300<br/><br/>
+<span class="cm"># Reload after changes</span><br/>
+<span class="pr">$</span> <span class="k">sudo so-suricata-reload</span>
+      </div>
+    </div>
+    <div class="card p-6">
+      <p class="snum mb-3">// TUNING WORKFLOW</p>
+      <div class="space-y-3">
+        <div class="flex gap-3 items-start">
+          <span class="w-6 h-6 rounded flex items-center justify-center text-xs shrink-0 mt-0.5 font-bold" style="background:rgba(224,90,58,.12);border:1px solid rgba(224,90,58,.3);color:var(--red);font-family:'Oxanium',sans-serif">1</span>
+          <p class="text-xs" style="color:var(--muted)"><strong style="color:var(--text)">Identify noise:</strong> Sort alerts by count. Top 10 noisiest rules = tune targets. In Kibana: aggregation on <span class="mono">alert.signature_id</span></p>
+        </div>
+        <div class="flex gap-3 items-start">
+          <span class="w-6 h-6 rounded flex items-center justify-center text-xs shrink-0 mt-0.5 font-bold" style="background:rgba(224,90,58,.12);border:1px solid rgba(224,90,58,.3);color:var(--red);font-family:'Oxanium',sans-serif">2</span>
+          <p class="text-xs" style="color:var(--muted)"><strong style="color:var(--text)">Check source:</strong> Is it an authorized scanner (Nessus/Qualys)? Known monitoring tool? Add suppress for that IP.</p>
+        </div>
+        <div class="flex gap-3 items-start">
+          <span class="w-6 h-6 rounded flex items-center justify-center text-xs shrink-0 mt-0.5 font-bold" style="background:rgba(224,90,58,.12);border:1px solid rgba(224,90,58,.3);color:var(--red);font-family:'Oxanium',sans-serif">3</span>
+          <p class="text-xs" style="color:var(--muted)"><strong style="color:var(--text)">Validate TP rate:</strong> Run rule against known-attack PCAP. If it still fires → keep rule, tune source whitelist only.</p>
+        </div>
+        <div class="flex gap-3 items-start">
+          <span class="w-6 h-6 rounded flex items-center justify-center text-xs shrink-0 mt-0.5 font-bold" style="background:rgba(224,90,58,.12);border:1px solid rgba(224,90,58,.3);color:var(--red);font-family:'Oxanium',sans-serif">4</span>
+          <p class="text-xs" style="color:var(--muted)"><strong style="color:var(--text)">Document changes:</strong> Every suppression needs a ticket. Undocumented suppressions create blind spots that attackers exploit.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════
+     PHASE 8 — THREAT HUNTING
+═══════════════════════════════════════════════ -->
+<section id="p8" class="mb-20">
+  <div class="flex items-center gap-4 mb-8">
+    <div class="w-12 h-12 rounded-xl flex items-center justify-center shrink-0" style="background:rgba(78,205,196,.1);border:1px solid rgba(78,205,196,.3)">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#4ecdc4" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    </div>
+    <div>
+      <span class="pbadge" style="background:rgba(78,205,196,.1);color:var(--teal);border:1px solid rgba(78,205,196,.25)">PHASE 08</span>
+      <h2 class="text-2xl font-bold mt-1">Threat Hunting with Security Onion</h2>
+    </div>
+  </div>
+
+  <!-- Hunt queries -->
+  <div class="grid md:grid-cols-2 gap-6 mb-6">
+    <div class="card p-6">
+      <p class="snum mb-3">// HUNT — BEACONING DETECTION</p>
+      <div class="cb teal text-xs">
+<span class="cm"># Find hosts with regular-interval outbound conns</span><br/>
+<span class="cm"># Zeek: extract connection intervals per dst</span><br/>
+<span class="pr">$</span> zeek-cut id.orig_h id.resp_h ts \<br/>
+&nbsp;&nbsp;&lt; /nsm/zeek/logs/current/conn.log \<br/>
+&nbsp;&nbsp;| awk <span class="s">'{print $1,$2,int($3/300)}'</span> \<br/>
+&nbsp;&nbsp;| sort | uniq -c | sort -rn \<br/>
+&nbsp;&nbsp;| head -20<br/><br/>
+<span class="cm"># In Kibana: date histogram on</span><br/>
+<span class="cm"># src+dst pair — look for regular spikes</span><br/>
+<span class="p">id.orig_h: "10.0.0.5" AND id.resp_h: "8.8.8.8"</span>
+      </div>
+    </div>
+    <div class="card p-6">
+      <p class="snum mb-3">// HUNT — DNS EXFILTRATION</p>
+      <div class="cb teal text-xs">
+<span class="cm"># Find unusually long DNS queries</span><br/>
+<span class="pr">$</span> zeek-cut query \<br/>
+&nbsp;&nbsp;&lt; /nsm/zeek/logs/current/dns.log \<br/>
+&nbsp;&nbsp;| awk <span class="s">'length > 50'</span> \<br/>
+&nbsp;&nbsp;| sort | uniq -c | sort -rn<br/><br/>
+<span class="cm"># High-entropy subdomains = Base64 data</span><br/>
+<span class="pr">$</span> zeek-cut query \<br/>
+&nbsp;&nbsp;&lt; dns.log \<br/>
+&nbsp;&nbsp;| grep -E <span class="s">'[a-zA-Z0-9+/]{25,}\.'</span><br/><br/>
+<span class="cm"># In Kibana KQL:</span><br/>
+<span class="p">event_type: "dns" AND</span><br/>
+<span class="p">dns.query.length: {50 TO *}</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="card p-6">
+    <p class="snum mb-4">// SO HUNT — QUERYING STENOGRAPHER FOR FULL PCAP</p>
+    <div class="cb text-xs">
+<span class="cm"># Pull full PCAP for specific IP + timeframe (Stenographer)</span><br/>
+<span class="pr">$</span> <span class="k">sudo so-pcap-export</span> \<br/>
+&nbsp;&nbsp;--start "2024-01-15T14:00:00" \<br/>
+&nbsp;&nbsp;--end "2024-01-15T15:00:00" \<br/>
+&nbsp;&nbsp;--host 10.0.0.50 \<br/>
+&nbsp;&nbsp;--output /tmp/suspect_traffic.pcap<br/><br/>
+<span class="cm"># Then analyze in Wireshark or tcpdump</span><br/>
+<span class="pr">$</span> <span class="k">tcpdump</span> -r /tmp/suspect_traffic.pcap -n -v<br/>
+<span class="cm"># Or: wireshark /tmp/suspect_traffic.pcap</span>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════
+     PHASE 9 — INCIDENT RESPONSE
+═══════════════════════════════════════════════ -->
+<section id="p9" class="mb-20">
+  <div class="flex items-center gap-4 mb-8">
+    <div class="w-12 h-12 rounded-xl flex items-center justify-center shrink-0" style="background:rgba(224,90,58,.1);border:1px solid rgba(224,90,58,.3)">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#e05a3a" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+    </div>
+    <div>
+      <span class="pbadge" style="background:rgba(224,90,58,.1);color:var(--red);border:1px solid rgba(224,90,58,.25)">PHASE 09</span>
+      <h2 class="text-2xl font-bold mt-1">Incident Investigation Workflow</h2>
+    </div>
+  </div>
+
+  <!-- Simulated alert -->
+  <div class="card mb-6 alert-sim" style="border-color:rgba(224,90,58,.4)">
+    <div class="px-5 py-3 flex items-center gap-2" style="background:rgba(224,90,58,.08);border-bottom:1px solid rgba(224,90,58,.2)">
+      <span class="w-2 h-2 rounded-full bg-red-500 inline-block animate-pulse"></span>
+      <span class="text-xs font-bold mono" style="color:var(--red)">SECURITY ONION ALERT — SEVERITY 1 — CRITICAL</span>
+    </div>
+    <div class="p-5 grid md:grid-cols-3 gap-4 text-xs mono">
+      <div><span style="color:var(--muted)">RULE:</span><br/><span style="color:var(--accent)">ET MALWARE Possible Reverse Shell</span></div>
+      <div><span style="color:var(--muted)">SRC:</span><br/><span style="color:var(--red)">10.0.0.55:50321</span></div>
+      <div><span style="color:var(--muted)">DST:</span><br/><span style="color:var(--gold)">185.220.101.42:4444</span></div>
+      <div><span style="color:var(--muted)">ZEEK UID:</span><br/><span style="color:var(--teal)">CmFk3a1sXdEj2abc</span></div>
+      <div><span style="color:var(--muted)">TIMESTAMP:</span><br/><span style="color:var(--text)">2024-01-15T14:32:11Z</span></div>
+      <div><span style="color:var(--muted)">DATA TRANSFERRED:</span><br/><span style="color:var(--red)">orig: 2.1MB resp: 450KB</span></div>
+    </div>
+  </div>
+
+  <!-- Investigation timeline -->
+  <div class="relative pl-14">
+    <div class="tl-line"></div>
+    <div class="space-y-5">
+      <div class="relative">
+        <div class="absolute -left-8 top-1 w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold shrink-0" style="background:var(--card);border:2px solid var(--accent);color:var(--accent);font-family:'Oxanium',sans-serif">1</div>
+        <div class="card p-5">
+          <p class="text-xs font-bold mb-1" style="color:var(--accent);font-family:'Oxanium',sans-serif">TRIAGE — Confirm alert legitimacy</p>
+          <p class="text-xs mb-2" style="color:var(--muted)">Check src host 10.0.0.55 in asset inventory. Is it a server, workstation, or monitored endpoint? Check if dst IP 185.220.101.42 is in threat intel feeds. Port 4444 = classic reverse shell port.</p>
+          <div class="cb text-xs mt-2">
+<span class="cm"># Quick triage queries in SO Console</span><br/>
+<span class="p">src_ip: "10.0.0.55"</span> | timeframe: last 24h<br/>
+<span class="cm"># How many other alerts from this host?</span>
+          </div>
+        </div>
+      </div>
+      <div class="relative">
+        <div class="absolute -left-8 top-1 w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold shrink-0" style="background:var(--card);border:2px solid var(--gold);color:var(--gold);font-family:'Oxanium',sans-serif">2</div>
+        <div class="card p-5">
+          <p class="text-xs font-bold mb-1" style="color:var(--gold);font-family:'Oxanium',sans-serif">INVESTIGATION — UID pivot + full context</p>
+          <div class="cb amber text-xs">
+<span class="cm"># Pivot on Zeek UID to get full session</span><br/>
+<span class="p">zeek_uid: "CmFk3a1sXdEj2abc"</span><br/>
+<span class="cm"># Find conn.log: duration? bytes? conn_state?</span><br/><br/>
+<span class="cm"># Check what happened before the alert</span><br/>
+<span class="p">id.orig_h: "10.0.0.55" AND @timestamp:[now-1h TO now]</span><br/>
+<span class="cm"># Recon? Downloads? HTTP requests?</span><br/><br/>
+<span class="cm"># Pull full PCAP of the session</span><br/>
+<span class="pr">$</span> sudo so-pcap-export --uid CmFk3a1sXdEj2abc
+          </div>
+        </div>
+      </div>
+      <div class="relative">
+        <div class="absolute -left-8 top-1 w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold shrink-0" style="background:var(--card);border:2px solid var(--teal);color:var(--teal);font-family:'Oxanium',sans-serif">3</div>
+        <div class="card p-5">
+          <p class="text-xs font-bold mb-1" style="color:var(--teal);font-family:'Oxanium',sans-serif">SCOPE — How far did it spread?</p>
+          <p class="text-xs" style="color:var(--muted)">Did 10.0.0.55 connect to other internal hosts after the reverse shell? Check lateral movement: new SSH connections, SMB activity, unusual auth events. Pull Zeek conn.log for all connections FROM this host in the last 6 hours.</p>
+        </div>
+      </div>
+      <div class="relative">
+        <div class="absolute -left-8 top-1 w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold shrink-0" style="background:var(--card);border:2px solid var(--red);color:var(--red);font-family:'Oxanium',sans-serif">4</div>
+        <div class="card p-5">
+          <p class="text-xs font-bold mb-1" style="color:var(--red);font-family:'Oxanium',sans-serif">RESPONSE — Contain & document</p>
+          <p class="text-xs" style="color:var(--muted)">Isolate 10.0.0.55 at switch/firewall. Create TheHive case with all IOCs: IP, UID, timestamps, PCAP path. Tag MITRE ATT&CK technique (T1059 - Command & Scripting Interpreter). Escalate to IR team.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════
+     PHASE 10 — ADVANCED
+═══════════════════════════════════════════════ -->
+<section id="p10" class="mb-20">
+  <div class="flex items-center gap-4 mb-8">
+    <div class="w-12 h-12 rounded-xl flex items-center justify-center shrink-0" style="background:rgba(212,168,67,.1);border:1px solid rgba(212,168,67,.3)">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#d4a843" stroke-width="2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+    </div>
+    <div>
+      <span class="pbadge" style="background:rgba(212,168,67,.1);color:var(--gold);border:1px solid rgba(212,168,67,.25)">PHASE 10</span>
+      <h2 class="text-2xl font-bold mt-1">Advanced Usage & Performance</h2>
+    </div>
+  </div>
+
+  <div class="grid md:grid-cols-3 gap-4">
+    <div class="card p-5">
+      <p class="text-xs font-bold mb-3" style="color:var(--gold);font-family:'Oxanium',sans-serif">ELASTICSEARCH TUNING</p>
+      <div class="cb amber text-xs">
+<span class="cm"># Shard + replica tuning</span><br/>
+<span class="cm"># /opt/so/conf/elasticsearch/</span><br/>
+<span class="cm"># elasticsearch.yml</span><br/><br/>
+<span class="g">indices.memory</span><br/>
+<span class="g">&nbsp;&nbsp;.index_buffer_size: 30%</span><br/>
+<span class="g">thread_pool.write.queue_size: 1000</span><br/><br/>
+<span class="cm"># Adjust index lifecycle</span><br/>
+<span class="pr">$</span> sudo so-elastic-configure<br/>
+<span class="cm"># Set retention: 30, 60, 90 days</span>
+      </div>
+    </div>
+    <div class="card p-5">
+      <p class="text-xs font-bold mb-3" style="color:var(--gold);font-family:'Oxanium',sans-serif">ZEEK WORKER SCALING</p>
+      <div class="cb amber text-xs">
+<span class="cm"># node.cfg — add more workers</span><br/>
+<span class="cm"># for high-throughput links</span><br/><br/>
+[<span class="g">worker-1</span>]<br/>
+type=worker<br/>
+host=localhost<br/>
+interface=ens33<br/>
+lb_method=pf_ring<br/>
+lb_procs=<span class="g">4</span><br/><br/>
+[<span class="g">worker-2</span>]<br/>
+type=worker<br/>
+host=localhost<br/>
+interface=ens33<br/>
+lb_procs=<span class="g">4</span>
+      </div>
+    </div>
+    <div class="card p-5">
+      <p class="text-xs font-bold mb-3" style="color:var(--gold);font-family:'Oxanium',sans-serif">EXTERNAL SIEM INTEGRATION</p>
+      <div class="cb amber text-xs">
+<span class="cm"># Forward EVE JSON to Splunk</span><br/>
+<span class="cm"># via Filebeat output</span><br/>
+<span class="g">output.logstash:</span><br/>
+&nbsp;&nbsp;<span class="g">hosts:</span> [<span class="s">"splunk:5044"</span>]<br/><br/>
+<span class="cm"># Or syslog forward</span><br/>
+<span class="g">output.syslog:</span><br/>
+&nbsp;&nbsp;<span class="g">host:</span> <span class="s">"siem.corp.com:514"</span><br/>
+&nbsp;&nbsp;<span class="g">protocol:</span> udp<br/><br/>
+<span class="cm"># Wazuh integration</span><br/>
+<span class="pr">$</span> sudo so-wazuh-configure
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════
+     PHASE 11 — LABS
+═══════════════════════════════════════════════ -->
+<section id="p11" class="mb-20">
+  <div class="flex items-center gap-4 mb-8">
+    <div class="w-12 h-12 rounded-xl flex items-center justify-center shrink-0" style="background:rgba(78,205,196,.1);border:1px solid rgba(78,205,196,.3)">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#4ecdc4" stroke-width="2"><path d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
+    </div>
+    <div>
+      <span class="pbadge" style="background:rgba(78,205,196,.1);color:var(--teal);border:1px solid rgba(78,205,196,.25)">PHASE 11</span>
+      <h2 class="text-2xl font-bold mt-1">Hands-On Lab Challenges</h2>
+    </div>
+  </div>
+
+  <div class="grid md:grid-cols-3 gap-4">
+    <!-- Beginner labs -->
+    <div class="card p-6" style="border-color:rgba(126,200,80,.2)">
+      <div class="flex items-center justify-between mb-5">
+        <span class="pbadge" style="background:rgba(126,200,80,.12);color:var(--accent)">BEGINNER</span>
+        <div class="pbar w-20"><div class="pfill" style="width:33%"></div></div>
+      </div>
+      <div class="space-y-4">
+        <div class="rounded-lg p-4" style="background:rgba(126,200,80,.04);border:1px solid rgba(126,200,80,.12)">
+          <p class="text-xs font-bold mb-1" style="color:var(--accent);font-family:'Oxanium',sans-serif">LAB-01 · First Import</p>
+          <p class="text-xs" style="color:var(--muted)">Run <span class="mono text-xs" style="color:var(--accent)">so-import-pcap</span> on the ARP poison PCAP. Find the alert in Kibana. Identify attacker MAC and victim IP.</p>
+        </div>
+        <div class="rounded-lg p-4" style="background:rgba(126,200,80,.04);border:1px solid rgba(126,200,80,.12)">
+          <p class="text-xs font-bold mb-1" style="color:var(--accent);font-family:'Oxanium',sans-serif">LAB-02 · Zeek Logs</p>
+          <p class="text-xs" style="color:var(--muted)">After import, use <span class="mono text-xs" style="color:var(--accent)">zeek-cut</span> on conn.log. Find the top 5 talkers. What protocols did they use?</p>
+        </div>
+        <div class="rounded-lg p-4" style="background:rgba(126,200,80,.04);border:1px solid rgba(126,200,80,.12)">
+          <p class="text-xs font-bold mb-1" style="color:var(--accent);font-family:'Oxanium',sans-serif">LAB-03 · Alert Triage</p>
+          <p class="text-xs" style="color:var(--muted)">Find the 3 most frequent Suricata signature IDs. Are they true positives? Write one-line triage note per alert.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Intermediate labs -->
+    <div class="card p-6" style="border-color:rgba(212,168,67,.2)">
+      <div class="flex items-center justify-between mb-5">
+        <span class="pbadge" style="background:rgba(212,168,67,.12);color:var(--gold)">INTERMEDIATE</span>
+        <div class="pbar w-20"><div class="pfill" style="width:66%"></div></div>
+      </div>
+      <div class="space-y-4">
+        <div class="rounded-lg p-4" style="background:rgba(212,168,67,.04);border:1px solid rgba(212,168,67,.12)">
+          <p class="text-xs font-bold mb-1" style="color:var(--gold);font-family:'Oxanium',sans-serif">LAB-04 · Custom Rule</p>
+          <p class="text-xs" style="color:var(--muted)">Write a Suricata rule for ICMP tunneling (payload &gt; 64 bytes). Deploy via Salt. Validate with ICMP tunnel PCAP.</p>
+        </div>
+        <div class="rounded-lg p-4" style="background:rgba(212,168,67,.04);border:1px solid rgba(212,168,67,.12)">
+          <p class="text-xs font-bold mb-1" style="color:var(--gold);font-family:'Oxanium',sans-serif">LAB-05 · UID Pivot</p>
+          <p class="text-xs" style="color:var(--muted)">Pick any Suricata alert. Use its Zeek UID to correlate across conn.log, dns.log, http.log. Document full session context.</p>
+        </div>
+        <div class="rounded-lg p-4" style="background:rgba(212,168,67,.04);border:1px solid rgba(212,168,67,.12)">
+          <p class="text-xs font-bold mb-1" style="color:var(--gold);font-family:'Oxanium',sans-serif">LAB-06 · FP Reduction</p>
+          <p class="text-xs" style="color:var(--muted)">Add a suppress rule for an internal scanning host firing false positives. Reload and verify alert count drops. Document why.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Advanced labs -->
+    <div class="card p-6" style="border-color:rgba(224,90,58,.2)">
+      <div class="flex items-center justify-between mb-5">
+        <span class="pbadge" style="background:rgba(224,90,58,.12);color:var(--red)">ADVANCED</span>
+        <div class="pbar w-20"><div class="pfill" style="width:100%"></div></div>
+      </div>
+      <div class="space-y-4">
+        <div class="rounded-lg p-4" style="background:rgba(224,90,58,.04);border:1px solid rgba(224,90,58,.12)">
+          <p class="text-xs font-bold mb-1" style="color:var(--red);font-family:'Oxanium',sans-serif">LAB-07 · Full Hunt</p>
+          <p class="text-xs" style="color:var(--muted)">Import all 12 attack PCAPs. Identify attacker IP(s). Build complete attack timeline with MITRE ATT&CK technique mapping.</p>
+        </div>
+        <div class="rounded-lg p-4" style="background:rgba(224,90,58,.04);border:1px solid rgba(224,90,58,.12)">
+          <p class="text-xs font-bold mb-1" style="color:var(--red);font-family:'Oxanium',sans-serif">LAB-08 · Rule Suite</p>
+          <p class="text-xs" style="color:var(--muted)">Write Suricata + Zeek detection coverage for all 12 attack types. Every rule must fire on its PCAP and not fire on benign traffic.</p>
+        </div>
+        <div class="rounded-lg p-4" style="background:rgba(224,90,58,.04);border:1px solid rgba(224,90,58,.12)">
+          <p class="text-xs font-bold mb-1" style="color:var(--red);font-family:'Oxanium',sans-serif">LAB-09 · Kibana Dashboard</p>
+          <p class="text-xs" style="color:var(--muted)">Build a SOC dashboard: top attackers, alert severity heatmap, DNS query volume, geo-IP map of external connections. Export as PDF report.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── FOOTER ──────────────────────────────────── -->
+<footer class="mt-16 pt-8" style="border-top:1px solid var(--border)">
+  <div class="flex flex-col md:flex-row items-center justify-between gap-4">
+    <div>
+      <p class="text-xs font-bold mono" style="color:var(--accent)">SECURITY ONION — COMPLETE SOC TRAINING</p>
+      <p class="text-xs mt-1" style="color:var(--muted);font-style:italic">11 Phases · Beginner to Advanced · Full NSM Stack</p>
+    </div>
+    <div class="flex items-center flex-wrap gap-3">
+      <span class="cpill" style="border-color:rgba(126,200,80,.3);color:var(--accent)">Suricata</span>
+      <span class="cpill" style="border-color:rgba(78,205,196,.3);color:var(--teal)">Zeek</span>
+      <span class="cpill" style="border-color:rgba(90,179,212,.3);color:var(--blue)">Elasticsearch</span>
+      <span class="cpill" style="border-color:rgba(155,114,207,.3);color:var(--purple)">Kibana</span>
+      <span class="cpill" style="border-color:rgba(224,90,58,.3);color:var(--red)">TheHive</span>
+    </div>
+  </div>
+  <p class="text-center text-xs mt-8 mono" style="color:rgba(61,79,53,.8)">// TRAIN HARD. MONITOR EVERYTHING. LEAVE NO BLIND SPOT.</p>
+</footer>
+
+</div>
+</body>
+</html>
